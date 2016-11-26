@@ -10,63 +10,69 @@ import random
 ip，端口，类型(0高匿名，1透明)，protocol(0 http,1 https),country(国家),area(省市),updatetime(更新时间)
  speed(连接速度)
 '''
-parserList = [
-        {
-            'urls': ['http://m.66ip.cn/%s.html'% n for n in ['index']+range(2,12)],
+parserList = [{
+            'source': '66ip.cn',
+            'urls': ['http://m.66ip.cn/%s.html' % n for n in ['index'] + range(2,12)],
             'type':'xpath',
             'pattern': ".//*[@class='profit-c']/table/tr[position()>1]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[4]','protocol':''}
         },
         {
-            'urls': ['http://m.66ip.cn/areaindex_%s/%s.html'%(m,n) for m in range(1,35) for n in range(1,10)],
+            'source': '66ip.cn',
+            'urls': ['http://m.66ip.cn/areaindex_%s/%s.html' % (m,n) for m in range(1,35) for n in range(1,10)],
             'type':'xpath',
             'pattern': ".//*[@id='footer']/div/table/tr[position()>1]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[4]','protocol':''}
         },
         {
-            'urls': ['http://www.kuaidaili.com/proxylist/%s/'% n for n in range(1,11)],
+            'source': 'kuaidaili.com',
+            'urls': ['http://www.kuaidaili.com/proxylist/%s/' % n for n in range(1,11)],
             'type': 'xpath',
             'pattern': ".//*[@id='index_free_list']/table/tbody/tr[position()>0]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[3]','protocol':'./td[4]'}
         },
         {
-            'urls': ['http://www.kuaidaili.com/free/%s/%s/'% (m,n) for m in ['inha', 'intr', 'outha', 'outtr'] for n in range(1,11)],
+            'source': 'kuaidaili.com',
+            'urls': ['http://www.kuaidaili.com/free/%s/%s/' % (m,n) for m in ['inha', 'intr', 'outha', 'outtr'] for n in range(1,11)],
             'type':'xpath',
             'pattern': ".//*[@id='list']/table/tbody/tr[position()>0]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[3]','protocol':'./td[4]'}
         },
         {
-            'urls': ['http://www.cz88.net/proxy/%s'% m for m in ['index.shtml']+['http_%s.shtml' % n for n in range(2, 11)]],
+            'source': 'cz88.net',
+            'urls': ['http://www.cz88.net/proxy/%s' % m for m in ['index.shtml'] + ['http_%s.shtml' % n for n in range(2, 11)]],
             'type':'xpath',
             'pattern':".//*[@id='boxright']/div/ul/li[position()>1]",
             'postion':{'ip':'./div[1]','port':'./div[2]','type':'./div[3]','protocol':''}
 
         },
         {
-            'urls': ['http://www.ip181.com/daili/%s.html'% n for n in range(1, 11)],
+            'source': 'ip181.com',
+            'urls': ['http://www.ip181.com/daili/%s.html' % n for n in range(1, 11)],
             'type':'xpath',
             'pattern': ".//div[@class='row']/div[3]/table/tbody/tr[position()>1]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[3]','protocol':'./td[4]'}
 
         },
         {
-            'urls': ['http://www.xicidaili.com/%s/%s'%(m,n) for m in ['nn', 'nt', 'wn', 'wt'] for n in range(1, 8) ],
+            'source': 'xicidaili.com/',
+            'urls': ['http://www.xicidaili.com/%s/%s' % (m,n) for m in ['nn', 'nt', 'wn', 'wt'] for n in range(1, 8) ],
             'type':'xpath',
             'pattern': ".//*[@id='ip_list']/tr[position()>1]",
             'postion':{'ip':'./td[2]','port':'./td[3]','type':'./td[5]','protocol':'./td[6]'}
         },
         {
-            'urls':['http://www.cnproxy.com/proxy%s.html'% i for i in range(1,11)],
+            'source': 'cnproxy.com/',
+            'urls':['http://www.cnproxy.com/proxy%s.html' % i for i in range(1,11)],
             'type':'module',
             'moduleName':'CnproxyPraser',
             'pattern':r'<tr><td>(\d+\.\d+\.\d+\.\d+)<SCRIPT type=text/javascript>document.write\(\"\:\"(.+)\)</SCRIPT></td><td>(HTTP|SOCKS4)\s*',
             'postion':{'ip':0,'port':1,'type':-1,'protocol':2}
-        }
-        ]
+        }]
 '''
 数据库的配置
 '''
-DB_CONFIG={
+DB_CONFIG = {
     'dbType':'sqlite',#sqlite,mysql,mongodb
     'dbPath':'./data/proxy.db',#这个仅仅对sqlite有效
     'dbUser':'',#用户名
@@ -75,25 +81,23 @@ DB_CONFIG={
 
 }
 
-CHINA_AREA=[u'河北',u'山东',u'辽宁',u'黑龙江',u'吉林'
+CHINA_AREA = [u'河北',u'山东',u'辽宁',u'黑龙江',u'吉林'
     ,u'甘肃',u'青海',u'河南',u'江苏',u'湖北',u'湖南',
             u'江西',u'浙江',u'广东',u'云南',u'福建',
             u'台湾',u'海南',u'山西',u'四川',u'陕西',
             u'贵州',u'安徽',u'重庆',u'北京',u'上海',u'天津',u'广西',u'内蒙',u'西藏',u'新疆',u'宁夏',u'香港',u'澳门']
-QQWRY_PATH="./data/qqwry.dat"
+QQWRY_PATH = "./data/qqwry.dat"
 
-THREADNUM = 20
-API_PORT=8000
+THREADNUM = 2000
+API_PORT = 8009
 '''
 爬虫爬取和检测ip的设置条件
 不需要检测ip是否已经存在，因为会定时清理
 '''
-UPDATE_TIME=20*60#每半个小时检测一次是否有代理ip失效
+UPDATE_TIME = 20 * 60#每半个小时检测一次是否有代理ip失效
 MINNUM = 50 #当有效的ip值小于一个时 需要启动爬虫进行爬取
-MAXTIME = 3*24*60 #当爬取存储开始一直使用的最大时间，如果超过这个时间，都删除
-
+MAXTIME = 3 * 24 * 60 #当爬取存储开始一直使用的最大时间，如果超过这个时间，都删除
 TIMEOUT = 5#socket延时
-
 
 
 '''
@@ -102,14 +106,13 @@ TIMEOUT = 5#socket延时
 '''
 重试次数
 '''
-RETRY_TIME=3
+RETRY_TIME = 3
 
 
 '''
 USER_AGENTS 随机头信息
 '''
-USER_AGENTS = [
-    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
+USER_AGENTS = ["Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
     "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.5; AOLBuild 4337.35; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
     "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
@@ -142,8 +145,7 @@ USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13pre",
     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0",
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
-    "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
-]
+    "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"]
 
 HEADER = {
     'User-Agent': random.choice(USER_AGENTS),
@@ -153,7 +155,7 @@ HEADER = {
     'Accept-Encoding': 'gzip, deflate',
 }
 
-TEST_URL='http://ip.chinaz.com/getip.aspx'
+TEST_URL = 'http://ip.chinaz.com/getip.aspx'
 # #添加的检测关键字，修复测试的代理是否能真正的访问到目的网址
 # TEST_KEY = '站长工具'
-TEST_PROXY='http://www.stilllistener.com/checkpoint1/test11/'
+TEST_PROXY = 'http://www.stilllistener.com/checkpoint1/test11/'

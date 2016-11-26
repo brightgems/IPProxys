@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b0143170-b09e-446b-b3fe-d6c047728130}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>IPProxys.py</StartupFile>
+    <SearchPath>.</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>{15a09ceb-8196-4d01-b827-f0696717386d}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="logging.conf" />
+    <Content Include="qiye2.jpg" />
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="api\apiServer.py" />
+    <Compile Include="api\__init__.py" />
+    <Compile Include="config.py" />
+    <Compile Include="db\SqlHelper.py" />
+    <Compile Include="db\SQLiteHelper.py" />
+    <Compile Include="db\__init__.py" />
+    <Compile Include="IPProxys.py" />
+    <Compile Include="spider\HtmlDownLoader.py" />
+    <Compile Include="spider\HtmlPraser.py" />
+    <Compile Include="spider\ProxySpider.py" />
+    <Compile Include="spider\__init__.py" />
+    <Compile Include="test\testhttpserver.py" />
+    <Compile Include="test\testlist.py" />
+    <Compile Include="test\testlxml.py" />
+    <Compile Include="test\testvalidator.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="test\__init__.py" />
+    <Compile Include="util\IPAddress.py" />
+    <Compile Include="util\logger.py" />
+    <Compile Include="util\__init__.py" />
+    <Compile Include="validator\Validator.py" />
+    <Compile Include="validator\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="api" />
+    <Folder Include="db" />
+    <Folder Include="spider" />
+    <Folder Include="test" />
+    <Folder Include="util" />
+    <Folder Include="validator" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{15a09ceb-8196-4d01-b827-f0696717386d}\2.7" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>
