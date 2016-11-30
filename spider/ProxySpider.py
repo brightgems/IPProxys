@@ -40,7 +40,7 @@ class ProxySpider(object):
                     proxys_tmp.extend(proxy)
                 #这个时候应该去重:
                 df_proxys = pd.DataFrame.from_records(proxys_tmp)
-                logger.info('first_proxys: %s' % len(proxys))
+                logger.info('first_proxys: %s' % len(proxys_tmp))
                 #这个时候proxys的格式是[{},{},{},{},{},{}]
                 
                 #这个时候开始去重:
