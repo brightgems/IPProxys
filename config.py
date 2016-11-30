@@ -12,7 +12,7 @@ ip，端口，类型(0高匿名，1透明)，protocol(0 http,1 https),country(�
 '''
 parserList = [{
             'source': '66ip.cn',
-            'urls': ['http://m.66ip.cn/%s.html' % n for n in ['index'] + range(2,12)],
+            'urls': ['http://m.66ip.cn/%s.html' % n for n in ['index'] + range(1,15)],
             'type':'xpath',
             'pattern': ".//*[@class='profit-c']/table/tr[position()>1]",
             'postion':{'ip':'./td[1]','port':'./td[2]','type':'./td[4]','protocol':''}
@@ -88,8 +88,8 @@ CHINA_AREA = [u'河北',u'山东',u'辽宁',u'黑龙江',u'吉林'
             u'贵州',u'安徽',u'重庆',u'北京',u'上海',u'天津',u'广西',u'内蒙',u'西藏',u'新疆',u'宁夏',u'香港',u'澳门']
 QQWRY_PATH = "./data/qqwry.dat"
 
-THREADNUM = 2000
-API_PORT = 8009
+THREADNUM = 200
+API_PORT = 8090
 '''
 爬虫爬取和检测ip的设置条件
 不需要检测ip是否已经存在，因为会定时清理

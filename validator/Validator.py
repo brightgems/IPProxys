@@ -1,11 +1,11 @@
 #coding:utf-8
 import datetime
-import time
-import traceback
+
 from lxml import etree
 from gevent.pool import Pool
 import requests
-
+import urllib2
+import time
 from config import TEST_URL
 import config
 from db.SQLiteHelper import SqliteHelper
@@ -81,6 +81,7 @@ class Validator(object):
 
         start = time.time()
         try:
+            
             r = requests.get(url=TEST_URL,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
 
             if not r.ok or r.text.find(ip)==-1:
@@ -111,7 +112,7 @@ class Validator(object):
         proxies={"http": "http://%s:%s"%(ip,port),"https": "http://%s:%s"%(ip,port)}
         proxyType = self.checkProxyType(proxies)
         if proxyType==3:
-            logger.info('failed %s:%s'%(ip,port))
+            logger.warn('failed %s:%s'%(ip,port))
 
             proxy = None
             return proxy
@@ -173,14 +174,21 @@ class Validator(object):
     def getMyIP(self):
         try:
             r = requests.get(url=config.TEST_PROXY,headers=config.HEADER,timeout=config.TIMEOUT)
-            
+            # print r.text
             root = etree.HTML(r.text)
             ip = root.xpath('.//center[2]/table/tr[3]/td[2]')[0].text
 
             logger.info('ip %s' %ip)
             return ip
         except Exception,e:
-            logger.error(str(e))
-            traceback.print_exc()
+            logger.info(str(e))
             return None
 
+if __name__=='__main__':
+    v = Validator(None)
+    v.getMyIP()
+    v.selfip
+    # results=[{'ip':'192.168.1.1','port':80}]*10
+    # results = v.run(results)
+    # print results
+    pass

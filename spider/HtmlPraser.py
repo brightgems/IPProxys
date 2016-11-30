@@ -61,7 +61,7 @@ class Html_Parser(object):
                 ip = proxy.xpath(parser['postion']['ip'])[0].text
                 port = proxy.xpath(parser['postion']['port'])[0].text
                 type = proxy.xpath(parser['postion']['type'])[0].text
-                logger.info('Found IP: %s,%s,%s' % ip,port,type)
+                logger.info('Found IP: %s,%s,%s' % (ip,port,type))
                 if type.find(u'高匿') != -1:
                     type = 0
                 else:

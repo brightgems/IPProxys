@@ -9,6 +9,10 @@ from config import API_PORT
 from db.SQLiteHelper import SqliteHelper
 from spider.ProxySpider import ProxySpider
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 logging.config.fileConfig('logging.conf')
 
 class IPProxys(object):
@@ -32,12 +36,8 @@ if __name__=="__main__":
     proxys = IPProxys()
 
     apiServer = threading.Thread(target=proxys.startApiServer)
-    spider = threading.Thread(target=proxys.startSpider)
+    
     apiServer.start()
-    spider.start()
-
-
-
-
+    proxys.startSpider()
 
 

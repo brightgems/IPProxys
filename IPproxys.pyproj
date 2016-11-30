@@ -42,6 +42,10 @@
     <Compile Include="test\testhttpserver.py" />
     <Compile Include="test\testlist.py" />
     <Compile Include="test\testlxml.py" />
+    <Compile Include="test\testapiserver.py" />
+    <Compile Include="test\testspider.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="test\testvalidator.py">
       <SubType>Code</SubType>
     </Compile>

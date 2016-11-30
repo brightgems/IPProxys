@@ -1,7 +1,7 @@
 #coding:utf-8
-import time
 from gevent.pool import Pool
 import requests
+import time
 from config import THREADNUM, parserList, MINNUM, UPDATE_TIME
 from db.SQLiteHelper import SqliteHelper
 from spider.HtmlDownLoader import Html_Downloader
@@ -35,15 +35,17 @@ class ProxySpider(object):
             if count[0] < MINNUM:
                 proxys = self.crawl_pool.map(self.crawl,parserList)
                 #这个时候proxys的格式是[[{},{},{}],[{},{},{}]]
-                # print proxys
+                proxys_tmp = []
+                for proxy in proxys:
+                    proxys_tmp.extend(proxy)
                 #这个时候应该去重:
-
-                df_proxys = pd.DataFrame(proxy)
+                df_proxys = pd.DataFrame.from_records(proxys_tmp)
                 logger.info('first_proxys: %s' % len(proxys))
                 #这个时候proxys的格式是[{},{},{},{},{},{}]
                 
                 #这个时候开始去重:
                 df_proxys = df_proxys.drop_duplicates('ip')
+                proxys = df_proxys.to_dict(orient='records')
                 #proxys = df_proxys
                 logger.info('end_proxy: %s' % len(proxys))
                 

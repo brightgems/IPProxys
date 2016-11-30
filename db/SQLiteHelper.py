@@ -88,9 +88,9 @@ class SqliteHelper(SqlHelper):
 
     def insert(self,tableName,value):
 
-        proxy = [value['source'],value['ip'],value['port'],value['type'],value['protocol'],value['country'],value['area'],value['updatetime'],value['speed']]
+        proxy = [value['source'],value['ip'],value['port'],value['type'],value['protocol'],value['country'],value['area'],value['speed']]
         # print proxy
-        self.cursor.execute("INSERT INTO %s (source,ip,port,types,protocol,country,area,updatetime,speed)VALUES (?,?,?,?,?,?,?,?,?)" % tableName
+        self.cursor.execute("INSERT INTO %s (source,ip,port,types,protocol,country,area,speed)VALUES (?,?,?,?,?,?,?,?)" % tableName
                             ,proxy)
 
 
