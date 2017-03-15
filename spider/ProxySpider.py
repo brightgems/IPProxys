@@ -1,19 +1,19 @@
 #coding:utf-8
+from gevent import monkey
+monkey.patch_all()
 from gevent.pool import Pool
 import requests
 import time
 from config import THREADNUM, parserList, MINNUM, UPDATE_TIME
-from db.SQLiteHelper import SqliteHelper
+from db.DataStore import store_data, sqlhelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from validator.Validator import Validator
 import pandas as pd
 import logging
-logger = logging.getLogger('spider')
+logger = logging.getLogger('parser')
 
-__author__ = 'Xaxdus'
-from gevent import monkey
-monkey.patch_all()
+
 '''
 这个类的作用是描述爬虫的逻辑
 '''
@@ -22,17 +22,14 @@ class ProxySpider(object):
 
     def __init__(self):
         self.crawl_pool = Pool(THREADNUM)
-        # self.sqlHelper = sqlHelper
 
     def run(self):
         while True:
-            logger.info("Start to run spider")
-            sqlHelper = SqliteHelper()
-            logger.info('Start to run validator')
-            validator = Validator(sqlHelper)
+            logger.info("Start to run spider...")
+            validator = Validator()
             count = validator.run_db()
             logger.info('Finished to run validator, count=%s' % count)
-            if count[0] < MINNUM:
+            if count < MINNUM:
                 proxys = self.crawl_pool.map(self.crawl,parserList)
                 #这个时候proxys的格式是[[{},{},{}],[{},{},{}]]
                 proxys_tmp = []

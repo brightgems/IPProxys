@@ -1,6 +1,8 @@
 #coding:utf-8
+from gevent import monkey
+monkey.patch_all()
 import datetime
-
+import json    
 from lxml import etree
 from gevent.pool import Pool
 import requests
@@ -8,22 +10,17 @@ import urllib2
 import time
 from config import TEST_URL
 import config
-from db.SQLiteHelper import SqliteHelper
+from db.DataStore import sqlhelper
 import logging
 logger = logging.getLogger("validator")
 
-from gevent import monkey
-monkey.patch_all()
-
-
-__author__ = 'Xaxdus'
 
 class Validator(object):
 
-    def __init__(self,sqlHelper):
+    def __init__(self):
 
         self.detect_pool = Pool(config.THREADNUM)
-        self.sqlHelper =sqlHelper
+        self.sqlHelper =sqlhelper
         self.selfip = self.getMyIP()
         self.detect_pool = Pool(config.THREADNUM)
 
@@ -71,7 +68,6 @@ class Validator(object):
 
     def detect_db(self,result):
         '''
-
         :param result: 从数据库中检测
         :return:
         '''
@@ -145,7 +141,7 @@ class Validator(object):
 
         try:
 
-            r = requests.get(url=config.TEST_PROXY,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
+            r = requests.get(url=config.TEST_HTTP_HEADER,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
             if r.ok:
                 root = etree.HTML(r.text)
                 ip = root.xpath('.//center[2]/table/tr[3]/td[2]')[0].text
@@ -173,19 +169,14 @@ class Validator(object):
 
     def getMyIP(self):
         try:
-            r = requests.get(url=config.TEST_PROXY,headers=config.HEADER,timeout=config.TIMEOUT)
-            # print r.text
-            root = etree.HTML(r.text)
-            ip = root.xpath('.//center[2]/table/tr[3]/td[2]')[0].text
-
-            logger.info('ip %s' %ip)
-            return ip
-        except Exception,e:
-            logger.info(str(e))
-            return None
+            r = requests.get(url=config.TEST_IP, headers=config.get_header(), timeout=config.TIMEOUT)
+            ip = json.loads(r.text)
+            return ip['origin']
+        except Exception as e:
+            raise Test_URL_Fail
 
 if __name__=='__main__':
-    v = Validator(None)
+    v = Validator()
     v.getMyIP()
     v.selfip
     # results=[{'ip':'192.168.1.1','port':80}]*10

@@ -17,7 +17,7 @@ class Html_Downloader(object):
         r=''
         logger.info("downloading url: %s",url)
         try:
-            r = requests.get(url=url,headers=config.HEADER,timeout=config.TIMEOUT)
+            r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT)
             r.encoding =chardet.detect(r.content)['encoding']
             while count< config.RETRY_TIME:
                 if (not r.ok) or len(r.content)<500 :
