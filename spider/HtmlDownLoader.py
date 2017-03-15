@@ -27,7 +27,7 @@ class Html_Downloader(object):
                         choose = random.choice(json.loads(content))
                         proxies={"https": "http://%s:%s"%(choose[0],choose[1])}
                         try:
-                            r = requests.get(url=url,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
+                            r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT,proxies=proxies)
                             r.encoding ='gbk'
                             count += 1
                         except Exception,e:
@@ -51,7 +51,7 @@ class Html_Downloader(object):
                             choose = random.choice(json.loads(content))
                             proxies={"https": "http://%s:%s"%(choose[0],choose[1])}
                             try:
-                                r = requests.get(url=url,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
+                                r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT,proxies=proxies)
                                 r.encoding ='gbk'
                                 count += 1
                             except Exception,e:

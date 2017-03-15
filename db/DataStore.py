@@ -9,18 +9,14 @@ try:
         from db.MongoHelper import MongoHelper as SqlHelper
     else:
         from db.SqlHelper import SqlHelper as SqlHelper
-    sqlhelper = SqlHelper()
-    sqlhelper.init_db()
+    sqlHelper = SqlHelper()
+    sqlHelper.init_db()
 except Exception as e:
     raise Con_DB_Fail
 
 
 def store_data(queue2, db_proxy_num):
-    '''
-    读取队列中的数据，写入数据库中
-    :param queue2:
-    :return:
-    '''
+
     successNum = 0
     failNum = 0
     while True:
@@ -28,7 +24,7 @@ def store_data(queue2, db_proxy_num):
             proxy = queue2.get(timeout=300)
             if proxy:
 
-                sqlhelper.insert(proxy)
+                sqlHelper.insert(proxy)
                 successNum += 1
             else:
                 failNum += 1

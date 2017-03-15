@@ -57,6 +57,12 @@ class SqlHelper(ISqlHelper):
         self.session.add(proxy)
         self.session.commit()
 
+    def batch_insert(self,values):
+        objects  = [Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
+                      country=value['country'],
+                      area=value['area'], speed=value['speed']) for value in values]
+        self.session.bulk_save_objects(objects)
+        self.session.commit()
 
     def delete(self, conditions=None):
         if conditions:
@@ -74,6 +80,9 @@ class SqlHelper(ISqlHelper):
             deleteNum = 0
         return ('deleteNum', deleteNum)
 
+    def delete_all(self, values):
+        
+        self.session.commit()
 
     def update(self, conditions=None, value=None):
         '''

@@ -5,7 +5,7 @@ from gevent.pool import Pool
 import requests
 import time
 from config import THREADNUM, parserList, MINNUM, UPDATE_TIME
-from db.DataStore import store_data, sqlhelper
+from db.DataStore import store_data, sqlHelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from validator.Validator import Validator
@@ -27,7 +27,7 @@ class ProxySpider(object):
         while True:
             logger.info("Start to run spider...")
             validator = Validator()
-            count = validator.run_db()
+            count = validator.detect_db_proxys()
             logger.info('Finished to run validator, count=%s' % count)
             if count < MINNUM:
                 proxys = self.crawl_pool.map(self.crawl,parserList)
@@ -48,9 +48,9 @@ class ProxySpider(object):
                 
                 proxys = validator.run_list(proxys)#这个是检测后的ip地址
 
-                sqlHelper.batch_insert(sqlHelper.tableName,proxys)
-
-                logger.info('success ip: %s' % sqlHelper.selectCount())
+                sqlHelper.batch_insert(proxys)
+                proxys = sqlHelper.select()
+                logger.info('success ip: %d' % len(proxys))
                 sqlHelper.close()
             logger.info('Finished to run spider')
             time.sleep(UPDATE_TIME)
@@ -60,14 +60,14 @@ class ProxySpider(object):
         proxys = []
         html_parser = Html_Parser()
         for url in parser['urls']:
-           response = Html_Downloader.download(url)
-           if response != None:
-               proxylist = html_parser.parse(response,parser)
-               if proxylist != None:
-                  proxys.extend(proxylist)
+            response = Html_Downloader.download(url)
+            if response != None:
+                proxylist = html_parser.parse(response,parser)
+                if proxylist != None:
+                    proxys.extend(proxylist)
         return proxys
 
 
-if __name__ == "__main__":
+def start_spider():
     spider = ProxySpider()
     spider.run()

@@ -1,64 +1,47 @@
-#coding:utf-8
+# coding:utf-8
 '''
 定义几个关键字，count type,protocol,country,area,
 '''
-import urllib
-from config import API_PORT
-from db.SQLiteHelper import SqliteHelper
-
-__author__ = 'Xaxdus'
-
-import BaseHTTPServer
 import json
-import urlparse
+import sys
+import web
+import config
+from db.DataStore import sqlHelper
+from db.SqlHelper import Proxy
+
 import logging
 logger = logging.getLogger('api')
 
-# keylist=['count', 'types','protocol','country','area']
-class WebRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+urls = (
+    '/', 'select',
+    '/delete', 'delete'
+)
 
-    def do_GET(self):
-        """
-        """
-        dict={}
 
-        parsed_path = urlparse.urlparse(self.path)
-        try:
-            query = urllib.unquote(parsed_path.query)
-            logger.info("query %s" %query)
-            if query.find('&')!=-1:
-                params = query.split('&')
-                for param in params:
-                    dict[param.split('=')[0]]=param.split('=')[1]
-            else:
-                    dict[query.split('=')[0]]=query.split('=')[1]
-            str_count=''
-            conditions=[]
-            for key in dict:
-                if key =='count':
-                    str_count = 'lIMIT 0,%s'% dict[key]
-                if key =='country' or key =='area':
-                    conditions .append(key+" LIKE '"+dict[key]+"%'")
-                elif key =='types' or key =='protocol' or key =='country' or key =='area':
-                    conditions .append(key+"="+dict[key])
-            if len(conditions)>1:
-                conditions = ' AND '.join(conditions)
-            else:
-                conditions =conditions[0]
-            sqlHelper = SqliteHelper()
-            result = sqlHelper.select(sqlHelper.tableName,conditions,str_count)
-            # print type(result)
-            # for r in  result:
-            #     print r
-            data = [{'ip':item[0], 'port': item[1]} for item in result]
-            data = json.dumps(data)
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(data)
-        except Exception,e:
-            logger.warning(str(e))
-            self.send_response(404)
+def start_api_server():
+    logger.info("API server started at 0.0.0.0:%s" % config.API_PORT)
+    sys.argv.append('0.0.0.0:%s' % config.API_PORT)
+    app = web.application(urls, globals())
+    app.run()
 
-if __name__=='__main__':
-    server = BaseHTTPServer.HTTPServer(('0.0.0.0',API_PORT), WebRequestHandler)
-    server.serve_forever()
+
+class select(object):
+    def GET(self):
+        inputs = web.input()
+        json_result = json.dumps(sqlHelper.select(inputs.get('count', None), inputs))
+        return json_result
+
+
+class delete(object):
+    params = {}
+
+    def GET(self):
+        inputs = web.input()
+        json_result = json.dumps(sqlHelper.delete(inputs))
+        return json_result
+
+
+if __name__ == '__main__':
+    sys.argv.append('0.0.0.0:8000')
+    app = web.application(urls, globals())
+    app.run()

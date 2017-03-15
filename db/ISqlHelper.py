@@ -13,23 +13,23 @@ class ISqlHelper(object):
     def __init__(self):
         pass
 
-    def insert(self, tableName,value):
+    def insert(self, value):
         pass
 
     def batch_insert(self,values):
         pass
 
-    def delete(self, tableName, condition):
+    def delete(self,  condition):
         pass
 
-    def batch_delete(self, tableName,values):
+    def delete_all(self, values):
         pass
 
-    def update(self, tableName,condition,value):
+    def update(self, condition,value):
         pass
-    def select(self, tableName,condition,count):
+    def select(self, condition,count):
         pass
-    def selectOne(self,tableName,condition,value):
+    def selectOne(self,condition,value):
         pass
     def close(self):
         pass

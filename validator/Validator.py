@@ -10,7 +10,7 @@ import urllib2
 import time
 from config import TEST_URL
 import config
-from db.DataStore import sqlhelper
+from db.DataStore import sqlHelper
 import logging
 logger = logging.getLogger("validator")
 
@@ -20,25 +20,22 @@ class Validator(object):
     def __init__(self):
 
         self.detect_pool = Pool(config.THREADNUM)
-        self.sqlHelper =sqlhelper
+        self.sqlHelper = sqlHelper
         self.selfip = self.getMyIP()
         self.detect_pool = Pool(config.THREADNUM)
 
-    def run_db(self):
+    def detect_db_proxys(self):
         '''
         从数据库中检测
         :return:
         '''
         try:
-            #首先将超时的全部删除
-            self.deleteOld()
-            #接着检测剩余的ip,是否可用
-            results = self.sqlHelper.selectAll()
-            self.detect_pool.map(self.detect_db,results)
-            #将数据库进行压缩
-            self.sqlHelper.compress()
 
-            return self.sqlHelper.selectCount()#返回最终的数量
+            #接着检测剩余的ip,是否可用
+            results = self.sqlHelper.select()
+            self.detect_pool.map(self.detect_db_each,results)
+            results = self.sqlHelper.select()
+            return len(results) #返回最终的数量
         except Exception,e:
             logger.warning(str(e))
             return 0
@@ -51,52 +48,29 @@ class Validator(object):
         :param results:
         :return:
         '''
-        # proxys=[]
-        # for result in results:
-        proxys = self.detect_pool.map(self.detect_list,results)
-        #这个时候proxys的格式是[{},{},{},{},{}]
+        proxys = self.detect_pool.map(self.detect_proxy,results)
+        #这个时候proxys的格式是[{},{},{},{},{}], 过滤空对象
+        proxys = [p for p in proxys if p]
         return proxys
 
-    def deleteOld(self):
-        '''
-        删除旧的数据
-        :return:
-        '''
-        condition = "updatetime<'%s'"%((datetime.datetime.now() - datetime.timedelta(minutes=config.MAXTIME)).strftime('%Y-%m-%d %H:%M:%S'))
-        self.sqlHelper.delete(SqliteHelper.tableName,condition)
-
-
-    def detect_db(self,result):
+    def detect_db_each(self,proxy):
         '''
         :param result: 从数据库中检测
         :return:
         '''
-        ip = result[0]
-        port = str(result[1])
-        proxies={"http": "http://%s:%s"%(ip,port),"https": "http://%s:%s"%(ip,port)}
-
-        start = time.time()
-        try:
+        proxy_dict = {'ip': proxy[0], 'port': proxy[1]}
+        result = self.detect_proxy(proxy_dict)
+        if result:
+            import math
+            score = int(math.log((result['type']+1) * result['speed'] * 100))
+            proxy_str = '%s:%s' % (proxy[0], proxy[1])
             
-            r = requests.get(url=TEST_URL,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
-
-            if not r.ok or r.text.find(ip)==-1:
-                condition = "ip='"+ip+"' AND "+'port='+port
-                logger.info('failed %s:%s'%(ip,port))
-                self.sqlHelper.delete(SqliteHelper.tableName,condition)
-            else:
-                logger.info(r.text)
-                speed = round(time.time()-start, 2)
-                self.sqlHelper.update(SqliteHelper.tableName,'SET speed=? WHERE ip=? AND port=?',(speed,ip,port))
-                logger.info('success %s:%s, speed=%s'%(ip,port,speed))
-        except Exception,e:
-                condition = "ip='"+ip+"' AND "+'port='+port
-                logger.info('failed %s:%s'%(ip,port))
-                self.sqlHelper.delete(SqliteHelper.tableName,condition)
+            sqlHelper.update({'ip': proxy[0], 'port': proxy[1]}, {'score': score})
+        else:
+            sqlHelper.delete({'ip': proxy[0], 'port': proxy[1]})
 
 
-
-    def detect_list(self,proxy):
+    def detect_proxy(self,proxy):
         '''
         :param proxy: ip字典
         :return:
@@ -105,32 +79,19 @@ class Validator(object):
 
         ip = proxy['ip']
         port = proxy['port']
-        proxies={"http": "http://%s:%s"%(ip,port),"https": "http://%s:%s"%(ip,port)}
-        proxyType = self.checkProxyType(proxies)
-        if proxyType==3:
-            logger.warn('failed %s:%s'%(ip,port))
-
-            proxy = None
-            return proxy
+        proxies = {"http": "http://%s:%s" % (ip,port),"https": "http://%s:%s" % (ip,port)}
+        protocol, proxyType, speed = self.checkProxyType(proxies)
+        if protocol >= 0:
+            proxy['protocol'] = protocol
+            proxy['type'] = proxyType
+            proxy['speed'] = speed
+            logger.info('succeed %s:%s' % (ip,port))
         else:
-            proxy['type']=proxyType
-        start = time.time()
-        try:
-            r = requests.get(url=TEST_URL,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
-
-            if not r.ok or r.text.find(ip)==-1:
-                logger.info('failed %s:%s'%(ip,port))
-                proxy = None
-            else:
-                speed = round(time.time()-start,2)
-                logger.info('success %s:%s, speed=%s'%(ip,port,speed))
-                proxy['speed']=speed
-                # return proxy
-        except Exception,e:
-                logger.info('failed %s:%s'%(ip,port))
-                proxy = None
+            logger.warn('failed %s:%s' % (ip,port))
+            proxy = None
+        
         return proxy
-        # return proxys
+
 
     def checkProxyType(self,proxies):
         '''
@@ -139,25 +100,59 @@ class Validator(object):
         :return:
         '''
 
+        protocol = -1
+        types = -1
+        speed = -1
+        http, http_types, http_speed = self._checkHttpProxy(self.selfip, proxies)
+        https, https_types, https_speed = self._checkHttpProxy(self.selfip, proxies, False)
+        if http and https:
+            protocol = 2
+            types = http_types
+            speed = http_speed
+        elif http:
+            types = http_types
+            protocol = 0
+            speed = http_speed
+        elif https:
+            types = https_types
+            protocol = 1
+            speed = https_speed
+        else:
+            types = -1
+            protocol = -1
+            speed = -1
+        return protocol, types, speed
+
+    def _checkHttpProxy(self,selfip, proxies, isHttp=True):
+        types = -1
+        speed = -1
+        if isHttp:
+            test_url = config.TEST_HTTP_HEADER
+        else:
+            test_url = config.TEST_HTTPS_HEADER
         try:
-
-            r = requests.get(url=config.TEST_HTTP_HEADER,headers=config.HEADER,timeout=config.TIMEOUT,proxies=proxies)
+            start = time.time()
+            r = requests.get(url=test_url, headers=config.get_header(), timeout=config.TIMEOUT, proxies=proxies)
             if r.ok:
-                root = etree.HTML(r.text)
-                ip = root.xpath('.//center[2]/table/tr[3]/td[2]')[0].text
-                http_x_forwared_for = root.xpath('.//center[2]/table/tr[8]/td[2]')[0].text
-                http_via = root.xpath('.//center[2]/table/tr[9]/td[2]')[0].text
-                # print ip,http_x_forwared_for,http_via,type(http_via),type(http_x_forwared_for)
-                if ip==self.selfip:
-                    return 3
-                if http_x_forwared_for is None and http_via is None:
-                    return 0
-                if http_via != None and http_x_forwared_for.find(self.selfip)== -1:
-                    return 1
-
-                if http_via != None and http_x_forwared_for.find(self.selfip)!= -1:
-                    return 2
-            return 3
+                speed = round(time.time() - start, 2)
+                content = json.loads(r.text)
+                headers = content['headers']
+                ip = content['origin']
+                x_forwarded_for = headers.get('X-Forwarded-For', None)
+                x_real_ip = headers.get('X-Real-Ip', None)
+                if selfip in ip or ',' in ip:
+                    return False, types, speed
+                elif x_forwarded_for is None and x_real_ip is None:
+                    types = 0
+                elif selfip not in x_forwarded_for and selfip not in x_real_ip:
+                    types = 1
+                else:
+                    types = 2
+                return True, types, speed
+            else:
+                return False, types, speed
+        except Exception as e:
+            return False, types, speed
 
 
 
@@ -175,7 +170,7 @@ class Validator(object):
         except Exception as e:
             raise Test_URL_Fail
 
-if __name__=='__main__':
+if __name__ == '__main__':
     v = Validator()
     v.getMyIP()
     v.selfip
