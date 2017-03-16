@@ -11,9 +11,12 @@ import time
 from config import TEST_URL
 import config
 from db.DataStore import sqlHelper
+from requests.exceptions import HTTPError
+import math
 import logging
 logger = logging.getLogger("validator")
 
+from util.exception import Test_URL_Fail
 
 class Validator(object):
 
@@ -40,19 +43,6 @@ class Validator(object):
             logger.warning(str(e))
             return 0
 
-
-
-    def run_list(self,results):
-        '''
-        这个是先不进入数据库，直接从集合中删除
-        :param results:
-        :return:
-        '''
-        proxys = self.detect_pool.map(self.detect_proxy,results)
-        #这个时候proxys的格式是[{},{},{},{},{}], 过滤空对象
-        proxys = [p for p in proxys if p]
-        return proxys
-
     def detect_db_each(self,proxy):
         '''
         :param result: 从数据库中检测
@@ -61,11 +51,9 @@ class Validator(object):
         proxy_dict = {'ip': proxy[0], 'port': proxy[1]}
         result = self.detect_proxy(proxy_dict)
         if result:
-            import math
-            score = int(math.log((result['type']+1) * result['speed'] * 100))
             proxy_str = '%s:%s' % (proxy[0], proxy[1])
-            
-            sqlHelper.update({'ip': proxy[0], 'port': proxy[1]}, {'score': score})
+            logger.info("valid proxy from db:%s" % proxy_str)
+            sqlHelper.update(result)
         else:
             sqlHelper.delete({'ip': proxy[0], 'port': proxy[1]})
 
@@ -75,8 +63,6 @@ class Validator(object):
         :param proxy: ip字典
         :return:
         '''
-        # for proxy in proxys:
-
         ip = proxy['ip']
         port = proxy['port']
         proxies = {"http": "http://%s:%s" % (ip,port),"https": "http://%s:%s" % (ip,port)}
@@ -85,6 +71,7 @@ class Validator(object):
             proxy['protocol'] = protocol
             proxy['type'] = proxyType
             proxy['speed'] = speed
+            proxy['score'] = int(math.log((proxy['type'] + 1) * proxy['speed'] * 100))
             logger.info('succeed %s:%s' % (ip,port))
         else:
             logger.warn('failed %s:%s' % (ip,port))
@@ -167,14 +154,10 @@ class Validator(object):
             r = requests.get(url=config.TEST_IP, headers=config.get_header(), timeout=config.TIMEOUT)
             ip = json.loads(r.text)
             return ip['origin']
-        except Exception as e:
+        except HTTPError as e:
             raise Test_URL_Fail
 
 if __name__ == '__main__':
     v = Validator()
     v.getMyIP()
     v.selfip
-    # results=[{'ip':'192.168.1.1','port':80}]*10
-    # results = v.run(results)
-    # print results
-    pass

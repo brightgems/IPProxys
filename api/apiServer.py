@@ -4,44 +4,30 @@
 '''
 import json
 import sys
-import web
+from flask import Flask, session, redirect, url_for, escape, request
 import config
 from db.DataStore import sqlHelper
-from db.SqlHelper import Proxy
 
 import logging
 logger = logging.getLogger('api')
 
-urls = (
-    '/', 'select',
-    '/delete', 'delete'
-)
+app = Flask(__name__)
 
 
-def start_api_server():
-    logger.info("API server started at 0.0.0.0:%s" % config.API_PORT)
-    sys.argv.append('0.0.0.0:%s' % config.API_PORT)
-    app = web.application(urls, globals())
-    app.run()
+@app.route("/")
+def index():
+    inputs = request.args
+    json_result = json.dumps(sqlHelper.select(inputs.get('count', None), inputs))
+    return json_result
+
+@app.route("/delete")
+def delete():
+    inputs = request.args
+    json_result = json.dumps(sqlHelper.delete(inputs))
+    return json_result
 
 
-class select(object):
-    def GET(self):
-        inputs = web.input()
-        json_result = json.dumps(sqlHelper.select(inputs.get('count', None), inputs))
-        return json_result
+# set the secret key.  keep this really secret:
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-
-class delete(object):
-    params = {}
-
-    def GET(self):
-        inputs = web.input()
-        json_result = json.dumps(sqlHelper.delete(inputs))
-        return json_result
-
-
-if __name__ == '__main__':
-    sys.argv.append('0.0.0.0:8000')
-    app = web.application(urls, globals())
-    app.run()
+app.run(port=config.API_PORT)

@@ -93,13 +93,7 @@ class Html_Parser(object):
                     port = match[parser['position']['port']]
                     # 网站的类型一直不靠谱所以还是默认，之后会检测
                     type = 0
-                    # if parser['postion']['protocol'] > 0:
-                    # protocol = match[parser['postion']['protocol']]
-                    # if protocol.lower().find('https')!=-1:
-                    #         protocol = 1
-                    #     else:
-                    #         protocol = 0
-                    # else:
+                    
                     protocol = 0
                     addr = self.ips.getIpAddr(self.ips.str2ip(ip))
                     country = text_('')
