@@ -14,13 +14,13 @@ logger = logging.getLogger('api')
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/api")
 def index():
     inputs = request.args
     json_result = json.dumps(sqlHelper.select(inputs.get('count', None), inputs))
     return json_result
 
-@app.route("/delete")
+@app.route("/api/delete")
 def delete():
     inputs = request.args
     json_result = json.dumps(sqlHelper.delete(inputs))
