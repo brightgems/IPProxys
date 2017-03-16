@@ -4,7 +4,7 @@
 '''
 import json
 import sys
-from flask import Flask, session, redirect, url_for, escape, request
+from flask import Flask, session, redirect, url_for, escape, request,render_template
 import config
 from db.DataStore import sqlHelper
 
@@ -13,9 +13,12 @@ logger = logging.getLogger('api')
 
 app = Flask(__name__)
 
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route("/api")
-def index():
+def api():
     inputs = request.args
     json_result = json.dumps(sqlHelper.select(inputs.get('count', None), inputs))
     return json_result
