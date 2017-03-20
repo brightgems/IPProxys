@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
+    <InterpreterId>{15a09ceb-8196-4d01-b827-f0696717386d}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
@@ -23,6 +23,7 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="api\static\css\main.css" />
     <Content Include="logging.conf" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
@@ -31,6 +32,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\apiServer.py" />
+    <Compile Include="api\filters.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="api\__init__.py" />
     <Compile Include="config.py" />
     <Compile Include="db\DataStore.py">
@@ -70,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="api" />
+    <Folder Include="api\static\css\" />
     <Folder Include="db" />
     <Folder Include="api\static\" />
     <Folder Include="spider" />
@@ -80,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{15a09ceb-8196-4d01-b827-f0696717386d}\2.7" />
-    <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

@@ -4,8 +4,9 @@ from sqlalchemy import Column, Integer, String, DateTime, Numeric, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import DB_CONFIG
-
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from db.ISqlHelper import ISqlHelper
+import json
 
 '''
 sql操作的基类
@@ -51,14 +52,22 @@ class SqlHelper(ISqlHelper):
 
 
     def insert(self, value):
-        proxy = Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
-                      country=value['country'],
-                      area=value['area'], speed=value['speed'])
-        self.session.add(proxy)
-        self.session.commit()
+        """
+            create or replace proxy
+        """
+        p_= self.session.query(Proxy).filter(Proxy.id== value['ip']).first()
+        if p_:
+            p_.speed = value['speed']
+            self.session.commit()
+        else:
+            proxy = Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
+                          country=value['country'],
+                          area=value['area'], speed=value['speed'])
+            self.session.add(proxy)
+            self.session.commit()
 
     def batch_insert(self,values):
-        objects  = [Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
+        objects = [Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
                       country=value['country'],
                       area=value['area'], speed=value['speed']) for value in values]
         self.session.bulk_save_objects(objects)
@@ -145,6 +154,23 @@ class SqlHelper(ISqlHelper):
     def close(self):
         pass
 
+
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
 
 if __name__ == '__main__':
     sqlhelper = SqlHelper()

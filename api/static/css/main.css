@@ -1,0 +1,25 @@
+﻿body {
+	text-align: center;
+}
+
+.container, .container-fluid {
+	text-align: center;
+	/*//width: 800px;*/
+	display: inline-block;
+}
+
+.header, .mainbar, .footer {
+	text-align: center;
+	margin-top: 15px;
+    margin-left: 40px;
+}
+
+#leftbar{
+    position: absolute;
+    top: 50px;
+    left:10px;
+}
+
+.center-pills {
+	display: inline-block;
+}

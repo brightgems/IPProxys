@@ -48,14 +48,12 @@ class Validator(object):
         :param result: 从数据库中检测
         :return:
         '''
-        proxy_dict = {'ip': proxy[0], 'port': proxy[1]}
+        proxy_dict = {'ip': proxy.ip, 'port': proxy.port}
         result = self.detect_proxy(proxy_dict)
         if result:
-            proxy_str = '%s:%s' % (proxy[0], proxy[1])
-            logger.info("valid proxy from db:%s" % proxy_str)
             sqlHelper.update(result)
         else:
-            sqlHelper.delete({'ip': proxy[0], 'port': proxy[1]})
+            sqlHelper.delete({'ip': proxy.ip, 'port': proxy.port})
 
 
     def detect_proxy(self,proxy):
@@ -151,7 +149,7 @@ class Validator(object):
 
     def getMyIP(self):
         try:
-            r = requests.get(url=config.TEST_IP, headers=config.get_header(), timeout=config.TIMEOUT)
+            r = requests.get(url=config.TEST_IP, headers=config.get_header(), timeout=10)
             ip = json.loads(r.text)
             return ip['origin']
         except HTTPError as e:
