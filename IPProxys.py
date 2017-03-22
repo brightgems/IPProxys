@@ -11,8 +11,9 @@ from multiprocessing import Process
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-
-logging.config.fileConfig('logging.conf')
+import os
+BASE_DIR = os.path.dirname(__file__)
+logging.config.fileConfig(os.path.join(BASE_DIR,'logging.conf'))
 
 
 if __name__ == "__main__":

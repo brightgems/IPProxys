@@ -136,14 +136,9 @@ class Validator(object):
                 return True, types, speed
             else:
                 return False, types, speed
-        except Exception as e:
+        except Exception, e:
             return False, types, speed
-
-
-
-        except Exception,e:
             logger.warning(str(e))
-            return 3
 
 
 

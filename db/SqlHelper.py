@@ -1,13 +1,13 @@
 # coding:utf-8
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Numeric, create_engine, VARCHAR
+from sqlalchemy import Column, Integer, String, DateTime, Numeric, create_engine, VARCHAR,NVARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import DB_CONFIG
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from db.ISqlHelper import ISqlHelper
 import json
-
+import logging
 '''
 sql操作的基类
 包括ip，端口，types类型(0高匿名，1透明)，protocol(0 http,1 https http),country(国家),area(省市),updatetime(更新时间)
@@ -24,12 +24,23 @@ class Proxy(BaseModel):
     port = Column(Integer, nullable=False)
     types = Column(Integer, nullable=False)
     protocol = Column(Integer, nullable=False, default=0)
-    country = Column(VARCHAR(100), nullable=False)
-    area = Column(VARCHAR(100), nullable=False)
+    country = Column(NVARCHAR(100), nullable=False)
+    area = Column(NVARCHAR(100), nullable=False)
     updatetime = Column(DateTime(), default=datetime.datetime.utcnow)
     speed = Column(Numeric(5, 2), nullable=False)
     score = Column(Integer, nullable=False, default=0)
 
+def with_session(fn):
+    def go(self,*args, **kw):
+        try:
+            ret = fn(self,*args, **kw)
+            
+            self.session.commit()
+            return ret
+        except:
+            self.session.rollback()
+            raise
+    return go
 
 class SqlHelper(ISqlHelper):
     params = {'ip': Proxy.ip, 'port': Proxy.port, 'types': Proxy.types, 'protocol': Proxy.protocol,
@@ -43,6 +54,9 @@ class SqlHelper(ISqlHelper):
             self.engine = create_engine(DB_CONFIG['DB_CONNECT_STRING'], echo=False)
         DB_Session = sessionmaker(bind=self.engine)
         self.session = DB_Session()
+        self.logger = logging.getLogger("db")
+
+
 
     def init_db(self):
         BaseModel.metadata.create_all(self.engine)
@@ -50,29 +64,30 @@ class SqlHelper(ISqlHelper):
     def drop_db(self):
         BaseModel.metadata.drop_all(self.engine)
 
-
+    @with_session
     def insert(self, value):
         """
             create or replace proxy
         """
-        p_= self.session.query(Proxy).filter(Proxy.id== value['ip']).first()
+        p_ = self.session.query(Proxy).filter(Proxy.id == value['ip']).first()
         if p_:
             p_.speed = value['speed']
-            self.session.commit()
         else:
             proxy = Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
-                          country=value['country'],
-                          area=value['area'], speed=value['speed'])
+                            country=value['country'],
+                            area=value['area'], speed=value['speed'])
             self.session.add(proxy)
-            self.session.commit()
-
-    def batch_insert(self,values):
-        objects = [Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
-                      country=value['country'],
-                      area=value['area'], speed=value['speed']) for value in values]
-        self.session.bulk_save_objects(objects)
         self.session.commit()
 
+    @with_session
+    def batch_insert(self,values):
+        objects = [Proxy(ip=value['ip'], port=value['port'], types=value['types'], protocol=value['protocol'],
+                        country=value['country'],
+                        area=value['area'], speed=value['speed']) for value in values]
+        self.session.bulk_save_objects(objects)
+        self.session.commit()
+    
+    @with_session
     def delete(self, conditions=None):
         if conditions:
             conditon_list = []
@@ -93,6 +108,7 @@ class SqlHelper(ISqlHelper):
         
         self.session.commit()
 
+    @with_session
     def update(self, conditions=None, value=None):
         '''
         conditions的格式是个字典。类似self.params
