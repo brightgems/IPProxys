@@ -12,6 +12,7 @@ from db.DataStore import store_data, sqlHelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from validator.Validator import Validator
+from util.bloomfilter import BloomFilter
 import logging
 logger = logging.getLogger('spider')
 
@@ -26,15 +27,27 @@ class ProxySpider(object):
         self.crawl_tasks = []
         self.validate_tasks = []
         self.queue = Queue()
+        self.repo = None # init inside run
+        
+    def init_repo(self,ls_valid):
+        '''
+            init repository that port:ip has validated when db validation finished
+        '''
+        self.repo = BloomFilter()
+        for each in ls_valid:
+            ip = "%s:%s" % (each.ip, each.port)
+            self.repo.add(ip)
 
     def run(self):
         while True:
             logger.info("Start to run spider...")
             t1 = time.time()
             validator = Validator()
-            count = validator.detect_db_proxys()
-            logger.info('Finished to validate db proxy, count=%s' % count)
-            if count < MINNUM:
+            ls_valid = validator.detect_db_proxys()
+            valid_cnt = len(ls_valid)
+            self.init_repo(ls_valid)
+            logger.info('Finished to validate db proxy, count=%s' % valid_cnt)
+            if valid_cnt < MINNUM:
                 self.crawl_tasks = [gevent.spawn(self.crawl,each_site,self.queue) for each_site in parserList]
                 self.validate_tasks = [gevent.spawn_later(5,self.validate,self.queue) for i in range(THREADNUM)]
                 gevent.joinall(self.crawl_tasks + self.validate_tasks)
@@ -42,8 +55,8 @@ class ProxySpider(object):
                 logger.info('success ip: %d' % len(proxys))
                 sqlHelper.close()
             logger.info('Finished to run spider')
-            t2=time.time()
-            logger.info("Finish run spider in %fs",t2-t1)
+            t2 = time.time()
+            logger.info("Finish run spider in %fs",t2 - t1)
             time.sleep(UPDATE_TIME)
 
 
@@ -55,7 +68,12 @@ class ProxySpider(object):
                 proxylist = html_parser.parse(response,parser)
                 if proxylist != None:
                     for each in proxylist:
-                        queue.put_nowait(each)
+                        
+                        ip = "%s:%s" % (each['ip'], each['port'])
+                        if not ip in self.repo:
+                            self.repo.add(ip)
+                            queue.put_nowait(each)
+                            logger.debug("duplicate ip:%s" % ip)
 
     def validate(self,queue):
         validator = Validator()
@@ -65,7 +83,7 @@ class ProxySpider(object):
                 proxy_validated = validator.detect_proxy(proxy)
                 if proxy_validated:
                     sqlHelper.insert(proxy_validated)
-                gevent.sleep(0)
+                gevent.sleep(0.1)
         except Empty:
             print('Quitting time!') 
 

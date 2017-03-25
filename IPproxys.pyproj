@@ -11,8 +11,10 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>{15a09ceb-8196-4d01-b827-f0696717386d}</InterpreterId>
-    <InterpreterVersion>2.7</InterpreterVersion>
+    <InterpreterId>
+    </InterpreterId>
+    <InterpreterVersion>
+    </InterpreterVersion>
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
@@ -62,6 +64,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test\__init__.py" />
+    <Compile Include="util\bloomfilter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="util\compatibility.py" />
     <Compile Include="util\exception.py">
       <SubType>Code</SubType>
@@ -82,9 +87,6 @@
     <Folder Include="test" />
     <Folder Include="util" />
     <Folder Include="validator" />
-  </ItemGroup>
-  <ItemGroup>
-    <InterpreterReference Include="{15a09ceb-8196-4d01-b827-f0696717386d}\2.7" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

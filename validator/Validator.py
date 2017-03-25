@@ -30,7 +30,7 @@ class Validator(object):
     def detect_db_proxys(self):
         '''
         从数据库中检测
-        :return:
+        :return: validated Proxy objects
         '''
         try:
 
@@ -38,7 +38,7 @@ class Validator(object):
             results = self.sqlHelper.select()
             self.detect_pool.map(self.detect_db_each,results)
             results = self.sqlHelper.select()
-            return len(results) #返回最终的数量
+            return results #返回最终的数量
         except Exception,e:
             logger.warning(str(e))
             return 0
@@ -51,7 +51,7 @@ class Validator(object):
         proxy_dict = {'ip': proxy.ip, 'port': proxy.port}
         result = self.detect_proxy(proxy_dict)
         if result:
-            sqlHelper.update(result)
+            sqlHelper.update(conditions= proxy_dict,value= result)
         else:
             sqlHelper.delete({'ip': proxy.ip, 'port': proxy.port})
 
