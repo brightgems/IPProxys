@@ -1,2 +1,5 @@
 requests
-
+falsk
+passlib
+Flask-HTTPAuth
+itsdangerous

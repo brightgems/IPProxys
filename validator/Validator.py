@@ -51,9 +51,13 @@ class Validator(object):
         proxy_dict = {'ip': proxy.ip, 'port': proxy.port}
         result = self.detect_proxy(proxy_dict)
         if result:
-            sqlHelper.update(conditions= proxy_dict,value= result)
+            result['updatetime']=datetime.datetime.today()
+            result.pop('ip')
+            result.pop('port')
+            ret = sqlHelper.update(conditions= proxy_dict,value= result)
+            print(ret)
         else:
-            sqlHelper.delete({'ip': proxy.ip, 'port': proxy.port})
+            sqlHelper.delete(proxy_dict)
 
 
     def detect_proxy(self,proxy):
@@ -61,6 +65,7 @@ class Validator(object):
         :param proxy: ip字典
         :return:
         '''
+        proxy = proxy.copy()
         ip = proxy['ip']
         port = proxy['port']
         proxies = {"http": "http://%s:%s" % (ip,port),"https": "http://%s:%s" % (ip,port)}
@@ -69,10 +74,10 @@ class Validator(object):
             proxy['protocol'] = protocol
             proxy['type'] = proxyType
             proxy['speed'] = speed
-            proxy['score'] = int(math.log((proxy['type'] + 1) * proxy['speed'] * 100))
+            proxy['score'] = 1 if speed <= 2 else 0
             logger.info('succeed %s:%s' % (ip,port))
         else:
-            logger.warn('failed %s:%s' % (ip,port))
+            logger.debug('failed %s:%s' % (ip,port))
             proxy = None
         
         return proxy

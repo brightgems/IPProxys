@@ -7,7 +7,7 @@ import gevent
 
 import requests
 import time
-from config import THREADNUM, parserList, MINNUM, UPDATE_TIME
+from config import THREADNUM, parserList, MINNUM, UPDATE_TIME,COLLECT_HISTORY
 from db.DataStore import store_data, sqlHelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
@@ -53,7 +53,9 @@ class ProxySpider(object):
                 gevent.joinall(self.crawl_tasks + self.validate_tasks)
                 proxys = sqlHelper.select()
                 logger.info('success ip: %d' % len(proxys))
-                sqlHelper.close()
+            # 保存历史记录
+            if COLLECT_HISTORY:
+                sqlHelper.copy_history()
             logger.info('Finished to run spider')
             t2 = time.time()
             logger.info("Finish run spider in %fs",t2 - t1)

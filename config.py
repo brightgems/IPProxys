@@ -139,6 +139,11 @@ TIMEOUT = 3  # socket延时
 RETRY_TIME = 3
 
 '''
+收集历史数据到HISTORY表
+'''
+COLLECT_HISTORY = True
+
+'''
 USER_AGENTS 随机头信息
 '''
 USER_AGENTS = [
@@ -193,3 +198,5 @@ TEST_URL = 'http://ip.chinaz.com/getip.aspx'
 TEST_IP = 'http://httpbin.org/ip'
 TEST_HTTP_HEADER = 'http://httpbin.org/get'
 TEST_HTTPS_HEADER = 'https://httpbin.org/get'
+
+APP_SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'

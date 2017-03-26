@@ -19,5 +19,6 @@ logging.config.fileConfig(os.path.join(BASE_DIR,'logging.conf'))
 if __name__ == "__main__":
 
     start_spider()
+
     
 

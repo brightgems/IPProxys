@@ -30,7 +30,7 @@ def pretty_date(time=False):
         if second_diff < 3600:
             return str(second_diff / 60) + u" 秒前"
         if second_diff < 7200:
-            return "1小时前"
+            return u"1小时前"
         if second_diff < 86400:
             return str(second_diff / 3600) + u" 小时前"
     if day_diff == 1:
