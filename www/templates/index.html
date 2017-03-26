@@ -1,35 +1,48 @@
 ﻿{% extends "layout.html" %}
+
 {% block content %}
 <div class="panel panel-info">
     <!-- Default panel contents -->
-    
-    <div class="panel-heading"><h4>当前数据库共有<strong>{{proxys|length}}</strong>个IP代理</h4></div>
-    <!--<div class="panel-body">
-        <p></p>
-    </div>-->
 
-    <!-- Table -->
-    <table class="table">
-        <thead>
-            <tr>
-                <td style="width:20%;">IP地址</td>
-                <td style="width:15%;">端口</td>
-                <td style="width:30%;">地理位置</td>
-                <td style="width:15%;">连接速度</td>
-                <td style="width:20%;">更新时间</td>
-            </tr>
-        </thead>
-        <tbody>
-            {%- for proxy in proxys %}
-            <tr>
-                <td>{{proxy.ip}}</td>
-                <td>{{proxy.port}}</td>
-                <td>{{proxy.area}}</td>
-                <td>{{proxy.speed}}s</td>
-                <td>{{proxy.updatetime|pretty_date}}</td>
-            </tr>
-            {%- endfor %}
-        </tbody>
-    </table>
+    <div class="panel-heading"><h4>当前数据库共有<strong>{{proxys|length}}</strong>个IP代理</h4></div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4">
+                {% pie_chart proxy_stats_by_score with library={"title":"连接速度"} %}
+            </div>
+            <div class="col-md-4">
+                {% pie_chart proxy_stats_by_country with library={"title":"国家"} %}
+            </div>
+            <div class="col-md-4">
+                {% pie_chart proxy_stats_by_protocol with library={"title":"HTTP协议"} %}
+            </div>
+           
+        </div>
+
+        {% area_chart proxy_his_stats with library={"title":"最近7天趋势"}%}
+        <!-- Table -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <td style="width:20%;">IP地址</td>
+                    <td style="width:15%;">端口</td>
+                    <td style="width:30%;">地理位置</td>
+                    <td style="width:15%;">连接速度</td>
+                    <td style="width:20%;">更新时间</td>
+                </tr>
+            </thead>
+            <tbody>
+                {%- for proxy in proxys %}
+                <tr>
+                    <td>{{proxy.ip}}</td>
+                    <td>{{proxy.port}}</td>
+                    <td>{{proxy.area}}</td>
+                    <td>{{proxy.speed}}s</td>
+                    <td>{{proxy.updatetime|pretty_date}}</td>
+                </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endblock %}
 </div>
-{% endblock %}

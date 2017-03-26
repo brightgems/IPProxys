@@ -7,14 +7,14 @@ API TEST:
 '''
 import json
 
-from flask import Flask,abort,jsonify, globals, url_for, request,render_template,make_response
+from flask import Flask,abort,jsonify, globals,Blueprint, url_for, request,render_template,make_response
 from flask_httpauth import HTTPBasicAuth
 import config
 from db.DataStore import sqlHelper
 from filters import pretty_date
 from db.SqlHelper import AlchemyEncoder,User
-
-
+import pandas as pd
+import chartkick
 import logging
 logger = logging.getLogger('api')
 
@@ -62,9 +62,45 @@ def not_found(error):
 
 @app.route("/")
 def index():
+    def get_summary_data(proxys):
+        json_result = json.dumps(proxys,cls=AlchemyEncoder)
+        # load all data
+        df = pd.read_json(json_result)
+        df['score'] = df['score'].map({0:u'普通',1:u'高速'})
+        df['protocol'] = df['protocol'].map({0:u'HTTP',1:u'HTTPS',2:u'Both'})
+        # score
+        df_score = df.groupby(by='score')['ip'].count()
+        proxy_stats_by_score = df_score.to_json()
+        # country
+        df_country = df.groupby(by='country')['ip'].count()
+        proxy_stats_by_country = df_country.to_json()
+        # protocol
+        df_score = df.groupby(by='protocol')['ip'].count()
+        proxy_stats_by_protocol = df_score.to_json()
+        # 7 days trend
+        ret = sqlHelper.get_stats_7days_history()
+        df = pd.DataFrame(ret,columns=('updatetime','score','cnt'))
+        df['score'] = df['score'].map({0:u'普通',1:u'高速'})
+        df['updt'] = df['updatetime'].map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+        json_dict = []
+        
+        for cat,cat_data in df.groupby('score'):
+            grp_dict = {}
+            grp_dict['name'] = cat
+            grp_dict['data'] = cat_data[['updt','cnt']].values.tolist()
+            json_dict.append(grp_dict)
+        
+        proxy_his_stats = json.dumps(json_dict)
+        return proxy_stats_by_score,proxy_stats_by_country,proxy_stats_by_protocol,proxy_his_stats
+
     inputs = request.args
     proxys = sqlHelper.select(inputs.get('count', None), inputs)
-    return render_template("index.html" ,proxys = proxys)
+    proxy_stats_by_score,proxy_stats_by_country,proxy_stats_by_protocol,proxy_his_stats = get_summary_data(proxys)
+    return render_template("index.html" ,proxys = proxys,
+        proxy_stats_by_score=proxy_stats_by_score,
+        proxy_stats_by_country = proxy_stats_by_country,
+        proxy_stats_by_protocol = proxy_stats_by_protocol,
+        proxy_his_stats=proxy_his_stats)
 
 @app.route("/api/proxy/normal")
 @auth.login_required
@@ -133,4 +169,7 @@ def delete():
 app.secret_key = config.APP_SECRET_KEY
 app.static_folder = "static"
 app.jinja_env.filters['pretty_date'] = pretty_date
+ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='static')
+app.register_blueprint(ck, url_prefix='/ck')
+app.jinja_env.add_extension("chartkick.ext.charts")
 app.run(port=config.API_PORT,debug=True)

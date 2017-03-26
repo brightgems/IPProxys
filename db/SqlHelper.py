@@ -3,6 +3,8 @@ import datetime
 from sqlalchemy import text,Column,Index, Integer, String, DateTime, Numeric, create_engine, VARCHAR,NVARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
+from sqlalchemy import distinct
 from config import DB_CONFIG
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from db.ISqlHelper import ISqlHelper
@@ -250,6 +252,15 @@ class SqlHelper(ISqlHelper):
         else:
             return query.order_by(Proxy.score.desc(), Proxy.speed).all()
 
+    def get_stats_7days_history(self):
+        '''
+            get statics of proxy history at latest 7 days
+        '''
+        ret = self.session.query(ProxyHistory.updatetime,ProxyHistory.score, func.count()) \
+                            .filter(ProxyHistory.updatetime > datetime.datetime.now()+datetime.timedelta(days=-7)) \
+                            .group_by(ProxyHistory.updatetime,ProxyHistory.score) \
+                            .all()
+        return ret
 
     def close(self):
         pass
