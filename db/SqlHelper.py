@@ -1,6 +1,6 @@
 # coding:utf-8
 import datetime
-from sqlalchemy import text,Column,Index, Integer, String, DateTime, Numeric, create_engine, VARCHAR,NVARCHAR
+from sqlalchemy import text,Column,Index, Integer,Unicode, String, DateTime, Numeric, create_engine, VARCHAR,NVARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
@@ -61,8 +61,8 @@ class Proxy(BaseModel):
     port = Column(Integer, nullable=False)
     types = Column(Integer, nullable=False)
     protocol = Column(Integer, nullable=False, default=0)
-    country = Column(NVARCHAR(100), nullable=False)
-    area = Column(NVARCHAR(100), nullable=False)
+    country = Column(Unicode(100), nullable=False)
+    area = Column(Unicode(100), nullable=False)
     createtime = Column(DateTime(), default=datetime.datetime.now)
     updatetime = Column(DateTime(), default=datetime.datetime.now)
     speed = Column(Numeric(5, 2), nullable=False)
@@ -76,8 +76,8 @@ class ProxyHistory(BaseModel):
     port = Column(Integer, nullable=False)
     types = Column(Integer, nullable=False)
     protocol = Column(Integer, nullable=False, default=0)
-    country = Column(NVARCHAR(100), nullable=False)
-    area = Column(NVARCHAR(100), nullable=False)
+    country = Column(Unicode(100), nullable=False)
+    area = Column(Unicode(100), nullable=False)
     updatetime = Column(DateTime())
     speed = Column(Numeric(5, 2), nullable=False)
     score = Column(Integer, nullable=False, default=0)
@@ -256,9 +256,9 @@ class SqlHelper(ISqlHelper):
         '''
             get statics of proxy history at latest 7 days
         '''
-        ret = self.session.query(ProxyHistory.updatetime,ProxyHistory.score, func.count()) \
-                            .filter(ProxyHistory.updatetime > datetime.datetime.now()+datetime.timedelta(days=-7)) \
-                            .group_by(ProxyHistory.updatetime,ProxyHistory.score) \
+        ret = self.session.query(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score, func.count()) \
+                            .filter(func.Datetime(ProxyHistory.updatetime) > datetime.datetime.now()+datetime.timedelta(days=-7)) \
+                            .group_by(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score) \
                             .all()
         return ret
 
