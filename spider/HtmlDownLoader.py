@@ -23,7 +23,7 @@ class Html_Downloader(object):
             if r == '' or (not r.ok) or len(r.content) < 500 :
                 if ls_p:
                     choose = random.choice(ls_p)
-                    proxies = {"https": "http://%s:%s" % (choose[0],choose[1])}
+                    proxies = {"https": "http://%s:%s" % (choose.ip,choose.port)}
                     try:
                         r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT,proxies=proxies)
                         r.encoding = 'gbk'
