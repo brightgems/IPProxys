@@ -38,6 +38,9 @@ class TestSqlHelper(unittest.TestCase):
         
         print(json.dumps(json_dict))
 
+    def test_delete_history(self):
+        sqlHelper.delete_history()
+
 if __name__ == '__main__':
     unittest.main()
                                         

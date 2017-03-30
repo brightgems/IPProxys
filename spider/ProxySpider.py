@@ -44,7 +44,7 @@ class ProxySpider(object):
             t1 = time.time()
             validator = Validator()
             ls_valid = validator.detect_db_proxys()
-            valid_cnt = len(ls_valid)
+            valid_cnt = len(ls_valid) if ls_valid else 0
             self.init_repo(ls_valid)
             logger.info('Finished to validate db proxy, count=%s' % valid_cnt)
             if valid_cnt < MINNUM:

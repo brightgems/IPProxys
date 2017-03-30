@@ -5,6 +5,12 @@
 API TEST:
     
 '''
+import sys
+import os
+reload(sys)
+sys.setdefaultencoding('utf8')
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
 import json
 
 from flask import Flask,abort,jsonify, globals,Blueprint, url_for, request,render_template,make_response
@@ -67,7 +73,7 @@ def index():
         # load all data
         df = pd.read_json(json_result)
         df['score'] = df['score'].map({0:u'普通',1:u'高速'})
-        df['protocol'] = df['protocol'].map({0:u'HTTP',1:u'HTTPS',2:u'Both'})
+        df['protocol'] = df['protocol'].map({0:u'http',1:u'https',2:u'all'})
         # score
         df_score = df.groupby(by='score')['ip'].count()
         proxy_stats_by_score = df_score.to_json()
@@ -102,12 +108,14 @@ def index():
         proxy_stats_by_protocol = proxy_stats_by_protocol,
         proxy_his_stats=proxy_his_stats)
 
+protocol_type = {0:u'http',1:u'https',2:u'all'}
+
 @app.route("/api/proxy/normal")
 @auth.login_required
 def api_normal_proxys():
     inputs = request.args
     proxys = sqlHelper.select(inputs.get('count', None), {'score':0})
-    proxys_obj = ["%s:%d" % (p.ip, p.port) for p in proxys]
+    proxys_obj = [{'type':protocol_type[p.protocol],'addr':"%s:%d" % (p.ip, p.port)} for p in proxys]
     json_result = json.dumps(proxys_obj)
     return json_result
 
@@ -116,7 +124,7 @@ def api_normal_proxys():
 def api_fast_proxys():
     inputs = request.args
     proxys = sqlHelper.select(inputs.get('count', None),{'score':1})
-    proxys_obj = ["%s:%d" % (p.ip, p.port) for p in proxys]
+    proxys_obj = [{'type':protocol_type[p.protocol],'addr':"%s:%d" % (p.ip, p.port)} for p in proxys]
     json_result = json.dumps(proxys_obj)
     return json_result
 
@@ -125,7 +133,8 @@ def api_fast_proxys():
 def api_public_proxys():
     inputs = request.args
     proxys = sqlHelper.select(count=50,conditions= {'score':0})
-    json_result = json.dumps(proxys,cls=AlchemyEncoder)
+    proxys_obj = [{'type':protocol_type[p.protocol],'addr':"%s:%d" % (p.ip, p.port)} for p in proxys]
+    json_result = json.dumps(proxys_obj)
     return json_result
 
 @app.route("/api/proxy/vip")
@@ -145,7 +154,7 @@ def api_vip_proxys():
 def api_china_proxys():
     inputs = request.args
     proxys = sqlHelper.select(inputs.get('count', None), {'country':u'国内','socre':1})
-    proxys_obj = ["%s:%d" % (p.ip, p.port) for p in proxys]
+    proxys_obj = [{'type':protocol_type[p.protocol],'addr':"%s:%d" % (p.ip, p.port)} for p in proxys]
     json_result = json.dumps(proxys_obj)
     return json_result
 
@@ -154,7 +163,7 @@ def api_china_proxys():
 def api_oversee_proxys():
     inputs = request.args
     proxys = sqlHelper.select(inputs.get('count', 10), {'country':u'国外','socre':1,'protocol':1})
-    proxys_obj = ["%s:%d" % (p.ip, p.port) for p in proxys]
+    proxys_obj = [{'type':protocol_type[p.protocol],'addr':"%s:%d" % (p.ip, p.port)} for p in proxys]
     json_result = json.dumps(proxys_obj)
     return json_result
 

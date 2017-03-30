@@ -7,8 +7,6 @@ try:
 except ImportError:
     import pickle
 
-from cola.core.bloomfilter.hashtype import HashType
-
 
 default_hashbits = 96
 

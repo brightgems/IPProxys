@@ -1,5 +1,7 @@
 requests
-falsk
+Flask
 passlib
 Flask-HTTPAuth
 itsdangerous
+pandas
+chartkick
