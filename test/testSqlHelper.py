@@ -24,8 +24,8 @@ class TestSqlHelper(unittest.TestCase):
         print(proxy_stats_by_socre)
         
     def test_get_hist_trends(self):
-        ret= sqlHelper.get_stats_7days_history()
-        df=pd.DataFrame(ret,columns=('updatetime','score','cnt'))
+        ret = sqlHelper.get_stats_7days_history()
+        df = pd.DataFrame(ret,columns=('updatetime','score','cnt'))
         df['score'] = df['score'].map({0:u'普通',1:u'高速'})
         df['updt'] = df['updatetime'].map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
         json_dict = []
@@ -33,13 +33,14 @@ class TestSqlHelper(unittest.TestCase):
         for cat,cat_data in df.groupby('score'):
             grp_dict = {}
             grp_dict['name'] = cat
-            grp_dict['data'] =cat_data[['updt','cnt']].values.tolist()
+            grp_dict['data'] = cat_data[['updt','cnt']].values.tolist()
             json_dict.append(grp_dict)
         
         print(json.dumps(json_dict))
 
     def test_delete_history(self):
-        sqlHelper.delete_history()
+        ret = sqlHelper.delete_history()
+        print(ret)
 
 if __name__ == '__main__':
     unittest.main()

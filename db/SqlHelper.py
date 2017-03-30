@@ -178,13 +178,14 @@ class SqlHelper(ISqlHelper):
             self.session.commit()
         else:
             deleteNum = 0
-        return ('deleteNum', deleteNum)
+        return deleteNum
 
     @with_session
     def delete_history(self,days=7):
-        self.session.query(ProxyHistory) \
-                    .filter(func.Datetime(ProxyHistory.updatetime)<=datetime.datetime.now()-datetime.timedelta(days=days)) \
-                    .delete()
+        query = self.session.query(ProxyHistory) \
+                    .filter(func.Datetime(ProxyHistory.updatetime) <= datetime.datetime.now() - datetime.timedelta(days=days)) 
+        deleteNum = query.delete(synchronize_session=False)
+        return deleteNum
 
     def delete_all(self, values):
         
@@ -262,9 +263,9 @@ class SqlHelper(ISqlHelper):
         '''
             get statics of proxy history at latest 7 days
         '''
-        ret = self.session.query(ProxyHistory.updatetime,ProxyHistory.score, func.count()) \
-                            .filter(ProxyHistory.updatetime > datetime.datetime.now()+datetime.timedelta(days=-7)) \
-                            .group_by(ProxyHistory.updatetime,ProxyHistory.score) \
+        ret = self.session.query(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score, func.count()) \
+                            .filter(func.Datetime(ProxyHistory.updatetime) > datetime.datetime.now() + datetime.timedelta(days=-7)) \
+                            .group_by(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score) \
                             .all()
         return ret
 

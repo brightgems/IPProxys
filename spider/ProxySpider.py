@@ -7,12 +7,13 @@ import gevent
 
 import requests
 import time
-from config import THREADNUM, parserList, MINNUM, UPDATE_TIME,COLLECT_HISTORY
+from config import THREADNUM, parserList, MINNUM, UPDATE_TIME,COLLECT_HISTORY,HISTORY_KEEP_DAYS
 from db.DataStore import store_data, sqlHelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from validator.Validator import Validator
 from util.bloomfilter import BloomFilter
+from datetime import datetime,timedelta
 import logging
 logger = logging.getLogger('spider')
 
@@ -39,7 +40,11 @@ class ProxySpider(object):
             self.repo.add(ip)
 
     def run(self):
+        lastdeltm = datetime.now()
         while True:
+            if COLLECT_HISTORY and lastdeltm + timedelta(days=1) >datetime.now():
+                sqlHelper.delete_history(HISTORY_KEEP_DAYS)
+                lastdeltm = datetime.now()    
             logger.info("Start to run spider...")
             t1 = time.time()
             validator = Validator()
@@ -57,6 +62,8 @@ class ProxySpider(object):
             if COLLECT_HISTORY:
                 sqlHelper.copy_history()
             logger.info('Finished to run spider')
+
+
             t2 = time.time()
             logger.info("Finish run spider in %fs",t2 - t1)
             time.sleep(UPDATE_TIME)
