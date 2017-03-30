@@ -76,8 +76,8 @@ class ProxyHistory(BaseModel):
     port = Column(Integer, nullable=False)
     types = Column(Integer, nullable=False)
     protocol = Column(Integer, nullable=False, default=0)
-    country = Column(NVARCHAR(100), nullable=False)
-    area = Column(NVARCHAR(100), nullable=False)
+    country = Column(Unicode(100), nullable=False)
+    area = Column(Unicode(100), nullable=False)
     updatetime = Column(DateTime())
     speed = Column(Numeric(5, 2), nullable=False)
     score = Column(Integer, nullable=False, default=0)
@@ -263,7 +263,7 @@ class SqlHelper(ISqlHelper):
             get statics of proxy history at latest 7 days
         '''
         ret = self.session.query(ProxyHistory.updatetime,ProxyHistory.score, func.count()) \
-                            .filter(ProxyHistory.updatetime > datetime.datetime.now() + datetime.timedelta(days=-7)) \
+                            .filter(ProxyHistory.updatetime > datetime.datetime.now()+datetime.timedelta(days=-7)) \
                             .group_by(ProxyHistory.updatetime,ProxyHistory.score) \
                             .all()
         return ret

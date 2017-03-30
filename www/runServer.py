@@ -87,7 +87,7 @@ def index():
         ret = sqlHelper.get_stats_7days_history()
         df = pd.DataFrame(ret,columns=('updatetime','score','cnt'))
         df['score'] = df['score'].map({0:u'普通',1:u'高速'})
-        df['updt'] = df['updatetime'].map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+        #df['updt'] = df['updatetime'].map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
         json_dict = []
         
         for cat,cat_data in df.groupby('score'):

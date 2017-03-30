@@ -6,9 +6,12 @@ import argparse
 
 '''
 usage: 
-    python admin.py -u mars.yu@omnicommediagroup.com 1qz@WSX
-    python admin.py -t mars.yu@omnicommediagroup.com
+    python admin.py -r mars.yu@omnicommediagroup.com 1qz@WSX
+    python admin.py -r admin@ipmomentum.online 1qz@WSX
+    python admin.py -t admin@ipmomentum.online
     python admin.py -a eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0._6jmLfy5i96Ux_fLqIXwTHySY8rdSjvHGJw5VedbZ1I
+
+    my token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0._6jmLfy5i96Ux_fLqIXwTHySY8rdSjvHGJw5VedbZ1I
 '''
 
 if __name__ == '__main__':

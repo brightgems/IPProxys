@@ -5,3 +5,4 @@ Flask-HTTPAuth
 itsdangerous
 pandas
 chartkick
+gevent
