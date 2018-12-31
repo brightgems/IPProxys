@@ -21,17 +21,17 @@ class Html_Downloader(object):
         ls_p = sqlHelper.select(count=10,conditions= {'protocol':1})
         while count < config.RETRY_TIME:
             if r == '' or (not r.ok) or len(r.content) < 500 :
-                if ls_p:
+                if len(ls_p)>5 :
                     choose = random.choice(ls_p)
                     proxies = {"https": "http://%s:%s" % (choose.ip,choose.port)}
-                    try:
-                        r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT,proxies=proxies)
-                        r.encoding = 'gbk'
-                        count += 1
-                    except Exception,e:
-                            count += 1
                 else:
-                    return None
+                    proxies = {}
+                try:
+                    r = requests.get(url=url,headers=config.get_header(),timeout=config.TIMEOUT,proxies=proxies)
+                    r.encoding = 'gbk'
+                    count += 1
+                except Exception,e:
+                        count += 1
 
             else:
                 return r.text

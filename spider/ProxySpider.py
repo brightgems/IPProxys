@@ -8,12 +8,13 @@ import gevent
 import requests
 import time
 from config import THREADNUM, parserList, MINNUM, UPDATE_TIME,COLLECT_HISTORY,HISTORY_KEEP_DAYS
-from db.DataStore import store_data, sqlHelper
+from db.DataStore import sqlHelper
 from spider.HtmlDownLoader import Html_Downloader
 from spider.HtmlPraser import Html_Parser
 from validator.Validator import Validator
 from util.bloomfilter import BloomFilter
 from datetime import datetime,timedelta
+from db.SqlHelper import SqlHelper
 import logging
 logger = logging.getLogger('spider')
 
@@ -47,7 +48,7 @@ class ProxySpider(object):
                 lastdeltm = datetime.now()    
             logger.info("Start to run spider...")
             t1 = time.time()
-            validator = Validator()
+            validator = Validator(sqlHelper)
             ls_valid = validator.detect_db_proxys()
             valid_cnt = len(ls_valid) if ls_valid else 0
             self.init_repo(ls_valid)
@@ -85,13 +86,14 @@ class ProxySpider(object):
                             logger.debug("duplicate ip:%s" % ip)
 
     def validate(self,queue):
-        validator = Validator()
+        coroutine_sqlhelper = SqlHelper()
+        validator = Validator(coroutine_sqlhelper)
         try:
             while True:
                 proxy = queue.get(timeout=15) # decrements queue size by 1
                 proxy_validated = validator.detect_proxy(proxy)
                 if proxy_validated:
-                    sqlHelper.insert(proxy_validated)
+                    coroutine_sqlhelper.insert(proxy_validated)
                 gevent.sleep(0.1)
         except Empty:
             print('Quitting time!') 

@@ -13,15 +13,9 @@ python IPProxys.py
 ## 支持自动抓取的代理网站
 
 - [66免费代理](http://www.66ip.cn)
-- [中国IP代理](http://cn-proxy.com)
-- [秘密代理IP](http://www.mimiip.com)
 - [proxy-list](https://proxy-list.org)
-- [HideMy.name](http://incloak.com)
 - [快代理](http://www.kuaidaili.com)
-- [纯真](http://www.cz88.net)
-- [代理ip检测平台](http://www.ip181.com)
 - [西刺免费代理](http://www.xicidaili.com)
-- [代理服务器网](http://www.cnproxy.com)
 
 
 ## 项目依赖
@@ -129,7 +123,12 @@ print r.text
 3.又增加一个新的代理网站
 <br/>
 
------------------------------2016-7-20----------------------------
+-----------------------------2017-3-20----------------------------
 <br/>
-1.修复bug ,将数据库进行压缩
+1.增加web API访问接口
+<br/>
+
+-----------------------------2018-12-31----------------------------
+<br/>
+1.更新代理网站配置，删除不能访问的网站
 <br/>

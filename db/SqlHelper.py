@@ -1,6 +1,6 @@
 # coding:utf-8
 import datetime
-from sqlalchemy import text,Column,Index,Unicode,Integer, String, DateTime, Numeric, create_engine, VARCHAR,NVARCHAR
+from sqlalchemy import text,Column,Index,Unicode,Integer, String, DateTime, Numeric, create_engine, VARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
@@ -182,8 +182,10 @@ class SqlHelper(ISqlHelper):
 
     @with_session
     def delete_history(self,days=7):
+        before_dt = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d')
+
         query = self.session.query(ProxyHistory) \
-                    .filter(func.Datetime(ProxyHistory.updatetime) <= datetime.datetime.now() - datetime.timedelta(days=days)) 
+                    .filter(func.date(ProxyHistory.updatetime) <= before_dt) 
         deleteNum = query.delete(synchronize_session=False)
         return deleteNum
 
@@ -263,8 +265,9 @@ class SqlHelper(ISqlHelper):
         '''
             get statics of proxy history at latest 7 days
         '''
+        before_dt = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d')
         ret = self.session.query(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score, func.count()) \
-                            .filter(func.Datetime(ProxyHistory.updatetime) > datetime.datetime.now() + datetime.timedelta(days=-7)) \
+                            .filter(func.date(ProxyHistory.updatetime) > before_dt) \
                             .group_by(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score) \
                             .all()
         return ret

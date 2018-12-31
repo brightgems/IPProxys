@@ -5,16 +5,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b0143170-b09e-446b-b3fe-d6c047728130}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>admin.py</StartupFile>
+    <StartupFile>IPProxys.py</StartupFile>
     <SearchPath>.</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>
-    </InterpreterId>
-    <InterpreterVersion>
-    </InterpreterVersion>
+    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <CommandLineArguments>-a eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0._6jmLfy5i96Ux_fLqIXwTHySY8rdSjvHGJw5VedbZ1I</CommandLineArguments>
@@ -92,6 +90,10 @@
     <Folder Include="test" />
     <Folder Include="util" />
     <Folder Include="validator" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{78a4b93c-1013-41a9-a9c2-fdd132929b6b}\3.5" />
+    <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

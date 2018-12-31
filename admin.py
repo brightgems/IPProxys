@@ -16,7 +16,7 @@ usage:
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(description='Jimu Box Utility command')
+    parser = argparse.ArgumentParser(description='IP Proxy Utility command')
     parser.add_argument('-r','--register',nargs=2, help='register user')
     parser.add_argument('-t','--tokenize', help='generate auth token')
     parser.add_argument('-a','--authorize', help='authorize token')

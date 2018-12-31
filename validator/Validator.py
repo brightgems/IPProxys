@@ -10,7 +10,7 @@ import urllib2
 import time
 from config import TEST_URL
 import config
-from db.DataStore import sqlHelper
+from db.SqlHelper import SqlHelper
 from requests.exceptions import HTTPError
 import math
 import logging
@@ -20,10 +20,8 @@ from util.exception import Test_URL_Fail
 
 class Validator(object):
 
-    def __init__(self):
-
-        self.detect_pool = Pool(config.THREADNUM)
-        self.sqlHelper = sqlHelper
+    def __init__(self, coroutine_sqlhelper):
+        self.sqlHelper = coroutine_sqlhelper
         self.selfip = self.getMyIP()
         self.detect_pool = Pool(config.THREADNUM)
 
@@ -54,10 +52,10 @@ class Validator(object):
             result['updatetime']=datetime.datetime.today()
             result.pop('ip')
             result.pop('port')
-            ret = sqlHelper.update(conditions= proxy_dict,value= result)
+            ret = self.sqlHelper.update(conditions= proxy_dict,value= result)
             print(ret)
         else:
-            sqlHelper.delete(proxy_dict)
+            self.sqlHelper.delete(proxy_dict)
 
 
     def detect_proxy(self,proxy):

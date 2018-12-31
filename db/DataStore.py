@@ -9,7 +9,9 @@ try:
     sqlHelper = SqlHelper()
     sqlHelper.init_db()
 except Exception as e:
+    print(str(e))
     raise Con_DB_Fail
+
 
 
 def store_data(queue2, db_proxy_num):
