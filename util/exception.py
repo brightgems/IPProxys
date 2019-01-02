@@ -1,14 +1,14 @@
 # coding:utf-8
-import config
+import appconfig as config
 
 
 class Test_URL_Fail(Exception):
     def __str__(self):
-        str = "????%sʧ?ܣ???????????????" % config.TEST_IP
+        str = "IP test failed:" % config.TEST_IP
         return str
 
 
 class Con_DB_Fail(Exception):
     def __str__(self):
-        str = "ʹ??DB_CONNECT_STRING:%s--???????ݿ?ʧ??" % config.DB_CONNECT_STRING
+        str = "db connection failed: `DB_CONNECT_STRING` " % config.DB_CONNECT_STRING
         return str

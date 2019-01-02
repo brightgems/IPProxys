@@ -5,19 +5,19 @@
 API TEST:
     
 '''
-import sys
 import os
+BASE_DIR = os.path.dirname(__file__)
+import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
+sys.path.append(BASE_DIR)
 import json
 
 from flask import Flask,abort,jsonify, globals,Blueprint, url_for, request,render_template,make_response
 from flask_httpauth import HTTPBasicAuth
 import config
 from db.DataStore import sqlHelper
-from filters import pretty_date
+from util.filters import pretty_date
 from db.SqlHelper import AlchemyEncoder,User
 import pandas as pd
 import chartkick
@@ -86,6 +86,7 @@ def index():
         # 7 days trend
         ret = sqlHelper.get_stats_7days_history()
         df = pd.DataFrame(ret,columns=('updatetime','score','cnt'))
+        df['updatetime'] = df['updatetime'].astype('str')
         df['score'] = df['score'].map({0:u'普通',1:u'高速'})
         json_dict = []
         

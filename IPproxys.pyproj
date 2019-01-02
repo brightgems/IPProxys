@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b0143170-b09e-446b-b3fe-d6c047728130}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>IPProxys.py</StartupFile>
+    <StartupFile>runserver.py</StartupFile>
     <SearchPath>.</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -24,12 +24,13 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="www\static\css\main.css" />
+    <Content Include="static\css\main.css" />
     <Content Include="logging.conf" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
-    <Content Include="www\templates\index.html" />
-    <Content Include="www\templates\layout.html" />
+    <Content Include="static\chartkick.js" />
+    <Content Include="templates\index.html" />
+    <Content Include="templates\layout.html" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="admin.py" />
@@ -37,11 +38,10 @@
     <Compile Include="util\singleton.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="www\runServer.py" />
-    <Compile Include="www\filters.py">
+    <Compile Include="runServer.py" />
+    <Compile Include="util\filters.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="www\__init__.py" />
     <Compile Include="config.py" />
     <Compile Include="db\DataStore.py">
       <SubType>Code</SubType>
@@ -78,15 +78,14 @@
     <Compile Include="validator\__init__.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="www\" />
-    <Folder Include="www\static\" />
-    <Folder Include="www\static\css\" />
+    <Folder Include="static\" />
+    <Folder Include="static\css\" />
     <Folder Include="www\" />
     <Folder Include="www\static\css\" />
     <Folder Include="db" />
     <Folder Include="www\static\" />
     <Folder Include="spider" />
-    <Folder Include="www\templates\" />
+    <Folder Include="templates\" />
     <Folder Include="test" />
     <Folder Include="util" />
     <Folder Include="validator" />

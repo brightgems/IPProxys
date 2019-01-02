@@ -266,9 +266,9 @@ class SqlHelper(ISqlHelper):
             get statics of proxy history at latest 7 days
         '''
         before_dt = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d')
-        ret = self.session.query(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score, func.count()) \
+        ret = self.session.query(func.date(ProxyHistory.updatetime),ProxyHistory.score, func.count()) \
                             .filter(func.date(ProxyHistory.updatetime) > before_dt) \
-                            .group_by(func.Datetime(ProxyHistory.updatetime),ProxyHistory.score) \
+                            .group_by(func.date(ProxyHistory.updatetime),ProxyHistory.score) \
                             .all()
         return ret
 

@@ -53,7 +53,6 @@ class Validator(object):
             result.pop('ip')
             result.pop('port')
             ret = self.sqlHelper.update(conditions= proxy_dict,value= result)
-            print(ret)
         else:
             self.sqlHelper.delete(proxy_dict)
 
