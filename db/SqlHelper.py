@@ -174,7 +174,7 @@ class SqlHelper(ISqlHelper):
             query = self.session.query(Proxy)
             for condition in conditions:
                 query = query.filter(condition)
-            deleteNum = query.delete()
+            deleteNum = query.delete(synchronize_session='fetch')
             self.session.commit()
         else:
             deleteNum = 0
@@ -186,7 +186,7 @@ class SqlHelper(ISqlHelper):
 
         query = self.session.query(ProxyHistory) \
                     .filter(func.date(ProxyHistory.updatetime) <= before_dt) 
-        deleteNum = query.delete(synchronize_session=False)
+        deleteNum = query.delete(synchronize_session='fetch')
         return deleteNum
 
     def delete_all(self, values):
