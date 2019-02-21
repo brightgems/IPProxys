@@ -78,7 +78,7 @@ UPDATE_TIME = 60 * 60  # 每一个小时检测一次是否有代理ip失效
 MINNUM = 300  # 当有效的ip值小于一个时 需要启动爬虫进行爬取
 HISTORY_KEEP_DAYS = 7  # IP代理历史保存的天数，如果超过这个时间，都删除
 
-TIMEOUT = 3  # socket延时
+TIMEOUT = 15  # socket延时
 
 '''
 反爬虫的设置

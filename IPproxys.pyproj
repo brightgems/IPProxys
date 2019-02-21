@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b0143170-b09e-446b-b3fe-d6c047728130}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runserver.py</StartupFile>
+    <StartupFile>IPProxys.py</StartupFile>
     <SearchPath>.</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

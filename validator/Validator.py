@@ -127,7 +127,7 @@ class Validator(object):
                 ip = content['origin']
                 x_forwarded_for = headers.get('X-Forwarded-For', None)
                 x_real_ip = headers.get('X-Real-Ip', None)
-                if selfip in ip or ',' in ip:
+                if selfip in ip:
                     return False, types, speed
                 elif x_forwarded_for is None and x_real_ip is None:
                     types = 0
@@ -148,7 +148,7 @@ class Validator(object):
         try:
             r = requests.get(url=config.TEST_IP, headers=config.get_header(), timeout=10)
             ip = json.loads(r.text)
-            return ip['origin']
+            return ip['origin'].split(',')[0]
         except HTTPError as e:
             raise Test_URL_Fail
 
