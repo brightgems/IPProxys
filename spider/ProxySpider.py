@@ -36,6 +36,9 @@ class ProxySpider(object):
             init repository that port:ip has validated when db validation finished
         '''
         self.repo = BloomFilter()
+        if type(ls_valid) != list:
+            logger.warn('wrong ls_valid:'+str(ls_valid))
+            return
         for each in ls_valid:
             ip = "%s:%s" % (each.ip, each.port)
             self.repo.add(ip)
