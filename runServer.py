@@ -100,13 +100,15 @@ def index():
         return proxy_stats_by_score,proxy_stats_by_country,proxy_stats_by_protocol,proxy_his_stats
 
     inputs = request.args
-    proxys = sqlHelper.select(inputs.get('count', None), inputs)
+    proxys = sqlHelper.select(inputs.get('count', 800), inputs)
+    proxy_count = sqlHelper.query_count()
     proxy_stats_by_score,proxy_stats_by_country,proxy_stats_by_protocol,proxy_his_stats = get_summary_data(proxys)
-    return render_template("index.html" ,proxys = proxys,
+    return render_template("index.html" ,proxys = proxys[:30], # 最多显示50条
         proxy_stats_by_score=proxy_stats_by_score,
         proxy_stats_by_country = proxy_stats_by_country,
         proxy_stats_by_protocol = proxy_stats_by_protocol,
-        proxy_his_stats=proxy_his_stats)
+        proxy_his_stats=proxy_his_stats,
+        proxy_count=proxy_count)
 
 protocol_type = {0:u'http',1:u'https',2:u'all'}
 

@@ -31,7 +31,8 @@ class Validator(object):
         :return: validated Proxy objects
         '''
         try:
-
+            #删除重复ip
+            self.sqlHelper.del_duplicate_ip()
             #接着检测剩余的ip,是否可用
             results = self.sqlHelper.select()
             self.detect_pool.map(self.detect_db_each,results)

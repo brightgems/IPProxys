@@ -262,6 +262,23 @@ class SqlHelper(ISqlHelper):
         else:
             return query.order_by(Proxy.score.desc(), Proxy.speed).all()
 
+    def query_count(self):
+        return self.session.query(Proxy).count()
+
+    def del_duplicate_ip(self):
+        self.session.execute('''
+DELETE
+FROM  `proxys`
+where id in (
+    select id
+    from
+    (select row_number() over(partition by ip,port order by id) as num,*
+    FROM `proxys`
+    ) as t
+    WHERE num >1
+)         
+    '''.replace('\n',' '))
+
     def get_stats_7days_history(self):
         '''
             get statics of proxy history at latest 7 days
