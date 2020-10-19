@@ -14,24 +14,16 @@ ip，端口，类型(0高匿名，1透明)，protocol(0 http,1 https),country(�
 '''
 parserList = [
     {
-        'urls': ['http://www.66ip.cn/%s.html' % n for n in ['index'] + list(range(2, 12))],
+        'urls': ['http://www.66ip.cn/%s.html' % n for n in ['index'] + list(range(1, 5))],
         'type': 'xpath',
-        'pattern': ".//*[@id='main']/div/div[1]/table/tr[position()>1]",
+        'pattern': ".//*[@id='main']/div/div[1]/table//tr[position()>1]",
         'position': {'ip': './td[1]', 'port': './td[2]', 'type': './td[4]', 'protocol': ''}
     },
     {
         'urls': ['http://www.66ip.cn/areaindex_%s/%s.html' % (m, n) for m in range(1, 35) for n in range(1, 10)],
         'type': 'xpath',
-        'pattern': ".//*[@id='footer']/div/table/tr[position()>1]",
+        'pattern': ".//*[@id='footer']/div/table//tr[position()>1]",
         'position': {'ip': './td[1]', 'port': './td[2]', 'type': './td[4]', 'protocol': ''}
-    },
-    {
-        'urls': ['https://proxy-list.org/english/index.php?p=%s' % n for n in range(1, 10)],
-        'type': 'module',
-        'moduleName': 'proxy_listPraser',
-        'pattern': 'Proxy\(.+\)',
-        'position': {'ip': 0, 'port': -1, 'type': -1, 'protocol': 2}
-
     },
     {
         'urls': ['http://www.kuaidaili.com/free/%s/%s/' % (m, n) for m in ['inha', 'intr'] for n in
@@ -41,10 +33,10 @@ parserList = [
         'position': {'ip': './td[1]', 'port': './td[2]', 'type': './td[3]', 'protocol': './td[4]'}
     },
     {
-        'urls': ['http://www.xicidaili.com/%s/%s' % (m, n) for m in ['nn', 'nt', 'wn', 'wt'] for n in range(1, 8)],
+        'urls': ['http://www.freeproxylists.net/?c=&pt=&pr=HTTPS&a%5B%5D=0&a%5B%5D=1&a%5B%5D=2&u=0'],
         'type': 'xpath',
-        'pattern': "//*[@id='ip_list']/tbody/tr[position()>1]",
-        'position': {'ip': './td[2]', 'port': './td[3]', 'type': './td[5]', 'protocol': './td[6]'}
+        'pattern': "//table[@class='DataGrid']//tr[position()>1]",
+        'position': {'ip': './td[1]', 'port': './td[2]', 'type': './td[4]', 'protocol': './td[3]'}
     }
 ]
 '''
