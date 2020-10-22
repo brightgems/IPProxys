@@ -75,8 +75,12 @@ class ProxySpider(object):
 
     def crawl(self,parser,queue):
         html_parser = Html_Parser()
-        for url in parser['urls']:
+        urls =parser['urls']
+        if type(urls) is not list:
+            urls = [urls]
+        for url in urls:
             response = Html_Downloader.download(url)
+            import pdb; pdb.set_trace()
             if response != None:
                 proxylist = html_parser.parse(response,parser)
                 if proxylist != None:

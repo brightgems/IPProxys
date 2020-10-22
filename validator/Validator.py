@@ -8,7 +8,6 @@ from gevent.pool import Pool
 import requests
 import urllib2
 import time
-from config import TEST_URL
 import config
 from db.SqlHelper import SqlHelper
 from requests.exceptions import HTTPError

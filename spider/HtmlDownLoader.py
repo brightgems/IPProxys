@@ -18,10 +18,10 @@ class Html_Downloader(object):
         count = 0#重试次数
         r = ''
         logger.info("downloading url: %s",url)
-        ls_p = sqlHelper.select(count=10,conditions= {'protocol':1})
+        ls_p = sqlHelper.select(count=10,conditions= {'protocol':1, 'score':1})
         while count < config.RETRY_TIME:
             if r == '' or (not r.ok) or len(r.content) < 500 :
-                if len(ls_p)>5 :
+                if count==config.RETRY_TIME-1 :
                     choose = random.choice(ls_p)
                     proxies = {"https": "http://%s:%s" % (choose.ip,choose.port)}
                 else:
@@ -31,7 +31,8 @@ class Html_Downloader(object):
                     r.encoding = 'gbk'
                     count += 1
                 except Exception,e:
-                        count += 1
+                    import pdb; pdb.set_trace()
+                    count += 1
 
             else:
                 return r.text

@@ -37,8 +37,53 @@ parserList = [
         'type': 'xpath',
         'pattern': "//table[@class='DataGrid']//tr[position()>1]",
         'position': {'ip': './td[1]', 'port': './td[2]', 'type': './td[4]', 'protocol': './td[3]'}
-    }
+    },
+    {
+        'urls': ['https://proxy-list.org/english/index.php?p=%s' % n for n in range(1, 10)],
+        'type': 'module',
+        'moduleName': 'parser_listPraser',
+        'parser':'html'
+    },
+    {'urls': ['https://ip.ihuan.me/'],
+        'type': 'module', 'moduleName': 'parser_ihuan','parser':'lxml'},
+    {'urls': ['http://www.ip3366.net/free/?stype=%s' % n for n in range(
+        1, 3)], 'type': 'module', 'moduleName': 'parser_3366','parser':'lxml'},
+    {'urls': ['http://www.goubanjia.com/'], 'type': 'module',
+        'moduleName': 'parser_goubanjia', 'parser':'bs4'},
+    {'urls': 'http://www.kxdaili.com/dailiip.html',
+        'type': 'module', 'moduleName': 'parser_kaixin','parser':'lxml'},
+    {'urls': 'http://www.kxdaili.com/dailiip/2/1.html',
+        'type': 'module', 'moduleName': 'parser_kaixin','parser':'lxml'},
+    {'urls': 'http://www.nimadaili.com/gaoni/',
+        'type': 'module', 'moduleName': 'parser_nima','parser':'lxml'},
+    {'urls': 'http://www.nimadaili.com/http/',
+        'type': 'module', 'moduleName': 'parser_nima','parser':'lxml'},
+    {'urls': 'http://www.nimadaili.com/https/',
+        'type': 'module', 'moduleName': 'parser_nima','parser':'lxml'},
+    {'urls': 'http://www.data5u.com/', 'type': 'module', 'moduleName': 'parser_da5u','parser':'lxml'},
+    
+    {'urls': 'http://www.xsdaili.com/', 'type': 'module',
+        'moduleName': 'parser_xsdaili','parser':'lxml'},  # 需要爬取二级网页，已解决
+    
+    {'urls': 'http://www.66ip.cn/mo.php?tqsl=2048', 'type': 'module',
+        'moduleName': 'parser_66ip', 'parser': 'bs4'},  # 需要js解密，已解决
+    {'urls': 'https://proxy.seofangfa.com/',
+        'type': 'module', 'moduleName': 'parser_sff','parser':'lxml'},
+    {'urls': 'http://cool-proxy.net/proxies.json',
+        'type': 'module', 'moduleName': 'parser_cool','parser':'html'},
+    {'urls': ['http://www.proxylists.net/%s' % p for p in ['http_highanon.txt',
+                                                           'https_highanon.txt']], 
+                                                           'parser':'html', 'type': 'module', 'moduleName': 'parser_proxyls'},
+    {'urls': 'http://www.mrhinkydink.com/proxies.htm',
+        'type': 'module', 'moduleName': 'parser_mrhin','parser':'lxml'},
+    
+    # {'urls': ['https://proxy.mimvp.com/%s' % p for p in ['freeopen', 'freesole',
+    #                                                      'freesecret']], 'type': 'module', 'moduleName': 'parser_mipu','parser':'lxml'},  # 需要图片识别端口，已解决
+    # {'urls': 'https://ip.jiangxianli.com/blog.html',
+    #     'type': 'module', 'moduleName': 'parser_jxl','parser':'lxml'},  # 需要爬取二级网页，有问题
 ]
+
+
 '''
 数据库的配置
 '''
@@ -52,14 +97,13 @@ DB_CONFIG = {
     # 'DB_CONNECT_STRING': 'redis://localhost:6379/8',
 }
 
-CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林'
-    , '甘肃', '青海', '河南', '江苏', '湖北', '湖南',
+CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林', '甘肃', '青海', '河南', '江苏', '湖北', '湖南',
               '江西', '浙江', '广东', '云南', '福建',
               '台湾', '海南', '山西', '四川', '陕西',
               '贵州', '安徽', '重庆', '北京', '上海', '天津', '广西', '内蒙', '西藏', '新疆', '宁夏', '香港', '澳门']
 QQWRY_PATH = os.path.dirname(__file__) + "/data/qqwry.dat"
 
-THREADNUM = 5
+THREADNUM = 1
 API_PORT = 5000
 '''
 爬虫爬取和检测ip的设置条件
@@ -135,7 +179,27 @@ def get_header():
     }
 
 
-TEST_URL = 'http://ip.chinaz.com/getip.aspx'
+TEST_PROXY_URLS = [
+
+    # 下面的是主流搜索引擎搜ip的网址，相对比较开放，而且查询结果比较准确
+    {'url': 'https://www.baidu.com/s?wd=ip', 'type': 'baidu'},
+    {'url': 'https://www.sogou.com/web?query=ip', 'type': 'sogou'},
+    {'url': 'https://www.so.com/s?q=ip&src=srp&fr=none&psid=2d511001ad6e91af893e0d7e561f1bba', 'type': 'so'},
+    {'url': 'https://mijisou.com/?q=ip&category_general=on&time_range=&language=zh-CN&pageno=1', 'type': 'miji'},
+
+    # 下面的是专门查询本机公网ip的网址，请求不能过于频繁
+    {'url': 'http://pv.sohu.com/cityjson', 'type': 'sohu'},
+    {'url': 'http://ip.taobao.com/ipSearch.html', 'type': 'taobao'},
+    {'url': 'https://myip.ipip.net/', 'type': 'myip'},
+    {'url': 'http://httpbin.org/ip', 'type': 'httpbin'},
+    {'url': 'http://ip.chinaz.com/', 'type': 'chinaz'},
+    {'url': 'https://www.ipip.net/ip.html', 'type': 'ipip'},
+    {'url': 'https://ip.cn/', 'type': 'ipcn'},
+    {'url': 'https://tool.lu/ip/', 'type': 'luip'},
+    {'url': 'http://api.online-service.vip/ip/me', 'type': 'onlineservice'},
+    {'url': 'https://ip.ttt.sh/', 'type': 'ttt'},
+]
+
 TEST_IP = 'http://httpbin.org/ip'
 TEST_HTTP_HEADER = 'http://httpbin.org/get'
 TEST_HTTPS_HEADER = 'https://httpbin.org/get'
