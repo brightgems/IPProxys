@@ -31,7 +31,6 @@ class Html_Downloader(object):
                     r.encoding = 'gbk'
                     count += 1
                 except Exception,e:
-                    import pdb; pdb.set_trace()
                     count += 1
 
             else:

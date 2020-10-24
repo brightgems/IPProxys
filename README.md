@@ -12,10 +12,8 @@ python IPProxys.py
 
 ## 支持自动抓取的代理网站
 
-- [66免费代理](http://www.66ip.cn)
-- [proxy-list](https://proxy-list.org)
-- [快代理](http://www.kuaidaili.com)
-- [西刺免费代理](http://www.xicidaili.com)
+https://free-proxy-list.net/
+https://github.com/Eeyhan/IPproxy/blob/master/proxy.py
 
 
 ## 项目依赖

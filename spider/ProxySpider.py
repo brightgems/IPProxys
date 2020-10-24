@@ -80,7 +80,6 @@ class ProxySpider(object):
             urls = [urls]
         for url in urls:
             response = Html_Downloader.download(url)
-            import pdb; pdb.set_trace()
             if response != None:
                 proxylist = html_parser.parse(response,parser)
                 if proxylist != None:

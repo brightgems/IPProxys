@@ -103,13 +103,13 @@ CHINA_AREA = ['河北', '山东', '辽宁', '黑龙江', '吉林', '甘肃', '�
               '贵州', '安徽', '重庆', '北京', '上海', '天津', '广西', '内蒙', '西藏', '新疆', '宁夏', '香港', '澳门']
 QQWRY_PATH = os.path.dirname(__file__) + "/data/qqwry.dat"
 
-THREADNUM = 1
+THREADNUM = 5
 API_PORT = 5000
 '''
 爬虫爬取和检测ip的设置条件
 不需要检测ip是否已经存在，因为会定时清理
 '''
-UPDATE_TIME = 60 * 60  # 每一个小时检测一次是否有代理ip失效
+UPDATE_TIME = 60 * 30  # 每一个小时检测一次是否有代理ip失效
 MINNUM = 300  # 当有效的ip值小于一个时 需要启动爬虫进行爬取
 HISTORY_KEEP_DAYS = 7  # IP代理历史保存的天数，如果超过这个时间，都删除
 
